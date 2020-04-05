@@ -156,7 +156,7 @@ if __name__ == "__main__":
 
     # Creating shapes on GPU memory
     textura_marselo=createBackground()
-    cars = createCars(5)
+    car = createCar()
 
     # Our shapes here are always fully painted
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
@@ -169,7 +169,7 @@ if __name__ == "__main__":
         glClear(GL_COLOR_BUFFER_BIT)
 
         # Modifying only a specific node in the scene graph
-        wheelRotationNode = sg.findNode(cars, "wheelRotation")
+        wheelRotationNode = sg.findNode(car, "wheelRotation")
         theta = -10 * glfw.get_time()
         wheelRotationNode.transform = tr.rotationZ(theta)
 
@@ -195,8 +195,7 @@ if __name__ == "__main__":
 
 
         # Modifying only car 3
-        car3 = sg.findNode(cars, "scaledCar3")
-        car3.transform = tr.translate(0.3, 0.5 * np.sin(0.1 * theta), 0)
+        car.transform = tr.translate(0.3, 0.5 * np.sin(0.1 * theta), 0)
 
         # Uncomment to see the position of scaledCar_3, it will fill your terminal
         #print("car3Position =", sg.findPosition(cars, "scaledCar3"))
@@ -207,7 +206,7 @@ if __name__ == "__main__":
 
         # Drawing the Car
         glUseProgram(pipeline.shaderProgram)
-        sg.drawSceneGraphNode(cars, pipeline, "transform")
+        sg.drawSceneGraphNode(car, pipeline, "transform")
 
         # Once the render is done, buffers are swapped, showing only the complete scene.
         glfw.swap_buffers(window)
