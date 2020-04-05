@@ -4,28 +4,52 @@ Daniel Calderon, CC3501, 2019-2
 Drawing many cars in 2D using scene_graph2
 """
 
+"""Módulos"""
 import glfw
 from OpenGL.GL import *
 import OpenGL.GL.shaders
 import numpy as np
 import sys
 
+"""Módulos del Profe"""
 import Modulo.transformations as tr
 import Modulo.basic_shapes as bs
 import Modulo.scene_graph as sg
 import Modulo.easy_shaders as es
 
+"""Módulos mios"""
+import Modulo.csvtolist as ctl
+
+class Controller():
+    salto=False
+    saltando=False
+    
+    x=0
+    y=0
+    vy=0
+    g=9
+
+    posicion_inicial=0
+
+control=Controller()
 
 def on_key(window, key, scancode, action, mods):
-
     if action != glfw.PRESS:
         return
 
-    if key == glfw.KEY_ESCAPE:
+    if key == glfw.KEY_SPACE and control.saltando==False:
+        control.salto=True
+        return
+    
+    elif key == glfw.KEY_ESCAPE:
         sys.exit()
 
     else:
         print('Unknown key')
+
+
+
+
 
 
 def createCar():
