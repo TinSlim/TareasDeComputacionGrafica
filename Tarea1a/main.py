@@ -195,7 +195,7 @@ if __name__ == "__main__":
 
 
         # Modifying only car 3
-        car.transform = tr.translate(0.3, 0.5 * np.sin(0.1 * theta), 0)
+        car.transform = tr.matmul([tr.scale(0.3,0.3,0.3),   tr.translate(0,control.y/3, 0)])
 
         # Uncomment to see the position of scaledCar_3, it will fill your terminal
         #print("car3Position =", sg.findPosition(cars, "scaledCar3"))
