@@ -32,7 +32,22 @@ print(lista_parseada)
 lista_coordenada=ctl.parseado_coordenada(lista_parseada)
 print(lista_coordenada)
 
+#TODO   Funciones de prueba para el carril, son rectas
 
+def funcion_funcion(array,x_actual):
+    y=0
+    for ubicacion in range(len(array)):
+        if x_actual>array[ubicacion][0]:
+            y=(  (array[ubicacion+1][1]-array[ubicacion][1])/(array[ubicacion+1][0]-array[ubicacion][0]))*(x_actual-array[ubicacion][0])+array[ubicacion][1]
+    print(x_actual)
+    return y
+
+def derivada_funcion(array,x_actual):
+    variable=0
+    for ubicacion in range(len(array)):
+        if x_actual>array[ubicacion][0]:
+            variable=(  (array[ubicacion+1][1]-array[ubicacion][1])/(array[ubicacion+1][0]-array[ubicacion][0]))
+    return variable
 
 
 class Controller():
@@ -183,12 +198,6 @@ if __name__ == "__main__":
         wheelRotationNode.transform = tr.rotationZ(theta)
 
 
-        #Updating vertical position Y axis
-        control.y=control.y+control.vy
-
-        #Updating horizontal position X axis
-        control.x+=0.001
-
         #Using controller
         if control.salto==True:                                                                 #Salto
             print('salto')
@@ -197,9 +206,23 @@ if __name__ == "__main__":
             control.salto=False
             control.saltando=True
 
+        #Updating vertical position Y axis
+        control.y=control.y+control.vy
+
+        if control.y<funcion_funcion(lista_coordenada,control.x):           #Si cae en camino, sigue el camino      TODO
+            control.vy=0
+            control.saltando=False
+            control.y=funcion_funcion(lista_coordenada,control.x)
+
         if control.saltando and (control.y-control.posicion_inicial>3):    #Caída
             control.vy=-0.06
 
+        if not control.saltando and not control.salto:                              #Si no salta ni cae, sigue el camino
+            control.y=funcion_funcion(lista_coordenada,control.x)
+
+
+        #Updating horizontal position X axis
+        control.x+=0.001
 
 
 
