@@ -21,8 +21,12 @@ import Modulo.easy_shaders as es
 import Modulo.csvtolist as ctl
 
 
-#Using datos.csv file to make a list
-archivo_csv=print(sys.argv[1])
+#Using datos.csv file to make a list        TODO  BORRAR TRY EXCEPT
+try:
+    archivo_csv=print(sys.argv[1])
+except:
+    archivo_csv="datos.csv"
+
 lista_parseada=ctl.parsear(archivo_csv)
 print(lista_parseada)
 lista_coordenada=ctl.parseado_coordenada(lista_parseada)
