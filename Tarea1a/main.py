@@ -111,6 +111,12 @@ def createCars(N):
 
     return cars
 
+def createBackground():                    
+    textura = es.toGPUShape(bs.createTextureQuad("fondo.jpg", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
+    background = sg.SceneGraphNode("background")
+    background.childs += [textura]
+    return background
+
 
 if __name__ == "__main__":
 
