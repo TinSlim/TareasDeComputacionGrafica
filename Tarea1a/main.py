@@ -185,6 +185,11 @@ if __name__ == "__main__":
     # Our shapes here are always fully painted
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
+
+    #Angulo inicial
+    derivada=derivada_funcion(lista_coordenada,control.x)
+    angulo=np.arctan(derivada)
+
     while not glfw.window_should_close(window):
         # Using GLFW to check for input events
         glfw.poll_events()
@@ -205,6 +210,13 @@ if __name__ == "__main__":
             control.vy=0.08
             control.salto=False
             control.saltando=True
+
+        #Rotación, ángulo se puede calcular a partir del arctan de la derivada:
+        if derivada <derivada_funcion(lista_coordenada,control.x):
+            derivada+=0.01
+        elif derivada>derivada_funcion(lista_coordenada,control.x):
+            derivada-=0.01
+        angulo=np.arctan(derivada)
 
         #Updating vertical position Y axis
         control.y=control.y+control.vy
@@ -227,7 +239,7 @@ if __name__ == "__main__":
 
 
         # Modifying only car 3
-        car.transform = tr.matmul([tr.scale(0.3,0.3,0.3),   tr.translate(0,control.y/3, 0)])
+        car.transform = tr.matmul([tr.scale(0.3,0.3,0.3),   tr.translate(0,control.y/3, 0),tr.rotationZ(angulo)])
 
         # Uncomment to see the position of scaledCar_3, it will fill your terminal
         #print("car3Position =", sg.findPosition(cars, "scaledCar3"))
