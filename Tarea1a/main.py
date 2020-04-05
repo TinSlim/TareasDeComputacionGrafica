@@ -124,10 +124,10 @@ if __name__ == "__main__":
     if not glfw.init():
         sys.exit()
 
-    width = 600
-    height = 600
+    width = 700
+    height = 700
 
-    window = glfw.create_window(width, height, "2D cars via scene graph", None, None)
+    window = glfw.create_window(width, height, "Roller Coaster of Death", None, None)
 
     if not window:
         glfw.terminate()
@@ -140,6 +140,7 @@ if __name__ == "__main__":
 
     # Assembling the shader program (pipeline) with both shaders
     pipeline = es.SimpleTransformShaderProgram()
+    pipeline2=es.SimpleTextureTransformShaderProgram()
     
     # Telling OpenGL to use our shader program
     glUseProgram(pipeline.shaderProgram)
@@ -148,6 +149,7 @@ if __name__ == "__main__":
     glClearColor(0.85, 0.85, 0.85, 1.0)
 
     # Creating shapes on GPU memory
+    textura_marselo=createBackground()
     cars = createCars(5)
 
     # Our shapes here are always fully painted
@@ -172,7 +174,12 @@ if __name__ == "__main__":
         # Uncomment to see the position of scaledCar_3, it will fill your terminal
         #print("car3Position =", sg.findPosition(cars, "scaledCar3"))
 
+        #Drawing Background  
+        glUseProgram(pipeline2.shaderProgram)
+        sg.drawSceneGraphNode(textura_marselo,pipeline2,"transform")
+
         # Drawing the Car
+        glUseProgram(pipeline.shaderProgram)
         sg.drawSceneGraphNode(cars, pipeline, "transform")
 
         # Once the render is done, buffers are swapped, showing only the complete scene.
