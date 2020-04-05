@@ -20,6 +20,12 @@ import Modulo.easy_shaders as es
 """Módulos mios"""
 import Modulo.csvtolist as ctl
 
+
+
+
+
+
+
 class Controller():
     salto=False
     saltando=False
@@ -166,6 +172,27 @@ if __name__ == "__main__":
         wheelRotationNode = sg.findNode(cars, "wheelRotation")
         theta = -10 * glfw.get_time()
         wheelRotationNode.transform = tr.rotationZ(theta)
+
+
+        #Updating vertical position Y axis
+        control.y=control.y+control.vy
+
+        #Updating horizontal position X axis
+        control.x+=0.001
+
+        #Using controller
+        if control.salto==True:                                                                 #Salto
+            print('salto')
+            control.posicion_inicial=control.y
+            control.vy=0.08
+            control.salto=False
+            control.saltando=True
+
+        if control.saltando and (control.y-control.posicion_inicial>3):    #Caída
+            control.vy=-0.06
+
+
+
 
         # Modifying only car 3
         car3 = sg.findNode(cars, "scaledCar3")
