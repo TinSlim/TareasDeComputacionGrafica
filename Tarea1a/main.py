@@ -80,14 +80,79 @@ def on_key(window, key, scancode, action, mods):
 
 
 
+def createHuman():
+    gpuTorso = es.toGPUShape(bs.createColorQuad(0,1,0))
+    gpuHombro = es.toGPUShape(bs.createColorQuad(0,0,1))
+    gpuAntebrazo = es.toGPUShape(bs.createColorQuad(0,0,0.5))
 
+    antebrazo = sg.SceneGraphNode("antebrazo")
+    antebrazo.transform=tr.matmul([tr.translate(0.65,-0.2,0),tr.rotationZ(30),tr.scale(0.45,0.86,1)])
+    antebrazo.childs+=[gpuAntebrazo]
+
+    hombro = sg.SceneGraphNode("hombro")
+    hombro.transform=tr.matmul([tr.rotationZ(1),tr.scale(0.5,1,1)])
+    hombro.childs+=[gpuHombro]
+
+    torso = sg.SceneGraphNode("torso")
+    torso.transform=tr.scale(0.7,1,1)
+    torso.childs+=[gpuTorso]
+
+    brazo= sg.SceneGraphNode("brazo")
+    brazo.transform=tr.matmul([tr.translate(0.5,0,0),tr.uniformScale(0.7)])
+    brazo.childs+=[hombro]
+    brazo.childs+=[antebrazo]
+
+    cuerpo=sg.SceneGraphNode("cuerpo")
+    cuerpo.transform=tr.uniformScale(0.5)
+    cuerpo.childs+=[torso]
+    cuerpo.childs+=[brazo]
+    
+
+    humano=sg.SceneGraphNode("humano")
+    humano.childs+=[cuerpo]
+
+
+    return humano
 
 def createCar():
+    gpuTorso = es.toGPUShape(bs.createColorQuad(0,1,0))
+    gpuHombro = es.toGPUShape(bs.createColorQuad(0,0,1))
+    gpuAntebrazo = es.toGPUShape(bs.createColorQuad(0,0,0.5))
 
+    antebrazo = sg.SceneGraphNode("antebrazo")
+    antebrazo.transform=tr.matmul([tr.translate(0.65,-0.2,0),tr.rotationZ(30),tr.scale(0.45,0.86,1)])
+    antebrazo.childs+=[gpuAntebrazo]
+
+    hombro = sg.SceneGraphNode("hombro")
+    hombro.transform=tr.matmul([tr.rotationZ(1),tr.scale(0.5,1,1)])
+    hombro.childs+=[gpuHombro]
+
+    torso = sg.SceneGraphNode("torso")
+    torso.transform=tr.scale(0.7,1,1)
+    torso.childs+=[gpuTorso]
+
+    brazo= sg.SceneGraphNode("brazo")
+    brazo.transform=tr.matmul([tr.translate(0.5,0,0),tr.uniformScale(0.7)])
+    brazo.childs+=[hombro]
+    brazo.childs+=[antebrazo]
+
+    cuerpo=sg.SceneGraphNode("cuerpo")
+    cuerpo.transform=tr.matmul([tr.translate(0,0.5,0),tr.uniformScale(0.5)])
+    cuerpo.childs+=[torso]
+    cuerpo.childs+=[brazo]
+    
+
+    humano=sg.SceneGraphNode("humano")
+    humano.childs+=[cuerpo]
+
+
+
+
+###########################
     gpuBlackQuad = es.toGPUShape(bs.createColorQuad(0,0,0))
     gpuRedQuad = es.toGPUShape(bs.createColorQuad(1,0,0))
-    
-    # Cheating a single wheel
+
+    # Creating a single wheel
     wheel = sg.SceneGraphNode("wheel")
     wheel.transform = tr.uniformScale(0.2)
     wheel.childs += [gpuBlackQuad]
@@ -116,7 +181,7 @@ def createCar():
 
     traslatedCar = sg.SceneGraphNode("traslatedCar")
     traslatedCar.transform = tr.translate(0,0.3,0)
-    traslatedCar.childs += [car]
+    traslatedCar.childs += [car,humano]
 
     return traslatedCar
 
@@ -181,6 +246,7 @@ if __name__ == "__main__":
     # Creating shapes on GPU memory
     textura_marselo=createBackground()
     car = createCar()
+    persona = createHuman()
 
     # Our shapes here are always fully painted
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
@@ -251,6 +317,7 @@ if __name__ == "__main__":
         # Drawing the Car
         glUseProgram(pipeline.shaderProgram)
         sg.drawSceneGraphNode(car, pipeline, "transform")
+        sg.drawSceneGraphNode(persona, pipeline, "transform")
 
         # Once the render is done, buffers are swapped, showing only the complete scene.
         glfw.swap_buffers(window)
