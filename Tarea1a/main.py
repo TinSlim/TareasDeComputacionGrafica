@@ -81,12 +81,12 @@ def on_key(window, key, scancode, action, mods):
 
 
 def createCar():
-    gpuTorso = es.toGPUShape(bs.createColorQuad(0,1,0))
-    gpuHombro = es.toGPUShape(bs.createColorQuad(1,0.764,0.67))
-    gpuAntebrazo = es.toGPUShape(bs.createColorQuad(1,0.764,0.67))
+    gpuTorso = es.toGPUShape(bs.createTextureQuad("monito.png", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
+    gpuHombro = es.toGPUShape(bs.createTextureQuad("hombro.png", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
+    gpuAntebrazo = es.toGPUShape(bs.createTextureQuad("antebrazo.png", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
 
     antebrazo = sg.SceneGraphNode("antebrazo")
-    antebrazo.transform=tr.matmul([tr.translate(0.65,-0.2,0),tr.rotationZ(30),tr.scale(0.45,0.86,1)])
+    antebrazo.transform=tr.matmul([tr.translate(0.65,-0.25,0),tr.rotationZ(1.3),tr.scale(0.45,0.86,1)])
     antebrazo.childs+=[gpuAntebrazo]
 
     hombro = sg.SceneGraphNode("hombro")
@@ -99,7 +99,7 @@ def createCar():
 
 
     brazo= sg.SceneGraphNode("brazo")
-    brazo.transform=tr.matmul([tr.translate(0.5,0,0),tr.uniformScale(0.7)])
+    brazo.transform=tr.matmul([tr.translate(0,-0.2,0),tr.uniformScale(0.4)])
     brazo.childs+=[hombro]
     brazo.childs+=[antebrazo]
 
@@ -107,20 +107,19 @@ def createCar():
     brazo_rotacion.childs+=[brazo]
 
     cuerpo=sg.SceneGraphNode("cuerpo")
-    cuerpo.transform=tr.matmul([tr.translate(-0.2,0.5,0),tr.uniformScale(0.5)])
+    cuerpo.transform=tr.matmul([tr.translate(0.05,0.25,0),tr.uniformScale(0.5)])
     cuerpo.childs+=[torso]
     cuerpo.childs+=[brazo_rotacion]
     
 
     humano=sg.SceneGraphNode("humano")
+    humano.transform=tr.scale(1,1.3,1)
     humano.childs+=[cuerpo]
 
 
-
-
-###########################
-    gpuBlackQuad = es.toGPUShape(bs.createColorQuad(0,0,0))
-    gpuRedQuad = es.toGPUShape(bs.createColorQuad(1,0,0))
+    ######################
+    gpuBlackQuad = es.toGPUShape(bs.createTextureQuad("rueda.png", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
+    gpuRedQuad = es.toGPUShape(bs.createTextureQuad("carrito.png", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
 
     # Creating a single wheel
     wheel = sg.SceneGraphNode("wheel")
@@ -220,6 +219,10 @@ if __name__ == "__main__":
     # Our shapes here are always fully painted
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
+     #Enable transparency
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+    
 
     #Angulo inicial
     derivada=derivada_funcion(lista_coordenada,control.x)
@@ -297,8 +300,8 @@ if __name__ == "__main__":
         sg.drawSceneGraphNode(textura_marselo,pipeline2,"transform")
 
         # Drawing the Car
-        glUseProgram(pipeline.shaderProgram)
-        sg.drawSceneGraphNode(car, pipeline, "transform")
+        glUseProgram(pipeline2.shaderProgram)
+        sg.drawSceneGraphNode(car, pipeline2, "transform")
 
         # Once the render is done, buffers are swapped, showing only the complete scene.
         glfw.swap_buffers(window)
