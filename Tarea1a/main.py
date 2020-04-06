@@ -131,15 +131,19 @@ def createCar():
     torso.transform=tr.scale(0.7,1,1)
     torso.childs+=[gpuTorso]
 
+
     brazo= sg.SceneGraphNode("brazo")
     brazo.transform=tr.matmul([tr.translate(0.5,0,0),tr.uniformScale(0.7)])
     brazo.childs+=[hombro]
     brazo.childs+=[antebrazo]
 
+    brazo_rotacion=sg.SceneGraphNode("brazo_rotacion")
+    brazo_rotacion.childs+=[brazo]
+
     cuerpo=sg.SceneGraphNode("cuerpo")
     cuerpo.transform=tr.matmul([tr.translate(0,0.5,0),tr.uniformScale(0.5)])
     cuerpo.childs+=[torso]
-    cuerpo.childs+=[brazo]
+    cuerpo.childs+=[brazo_rotacion]
     
 
     humano=sg.SceneGraphNode("humano")
@@ -255,7 +259,7 @@ if __name__ == "__main__":
     #Angulo inicial
     derivada=derivada_funcion(lista_coordenada,control.x)
     angulo=np.arctan(derivada)
-
+    rotacion=0
     while not glfw.window_should_close(window):
         # Using GLFW to check for input events
         glfw.poll_events()
@@ -268,6 +272,8 @@ if __name__ == "__main__":
         theta = -10 * glfw.get_time()
         wheelRotationNode.transform = tr.rotationZ(theta)
 
+        brazo_rotacion=sg.findNode(car,"brazo_rotacion")
+
 
         #Using controller
         if control.salto==True:                                                                 #Salto
@@ -277,10 +283,17 @@ if __name__ == "__main__":
             control.salto=False
             control.saltando=True
 
+        
         #Rotación, ángulo se puede calcular a partir del arctan de la derivada:
         if derivada <derivada_funcion(lista_coordenada,control.x):
             derivada+=0.01
+            if rotacion<0.8:
+                rotacion+=0.01
+                brazo_rotacion.transform=tr.rotationZ(rotacion)
         elif derivada>derivada_funcion(lista_coordenada,control.x):
+            if rotacion >0:
+                rotacion-=0.01
+                brazo_rotacion.transform=tr.rotationZ(rotacion)
             derivada-=0.01
         angulo=np.arctan(derivada)
 
