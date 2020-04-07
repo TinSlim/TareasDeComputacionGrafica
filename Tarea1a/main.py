@@ -39,7 +39,6 @@ def funcion_funcion(array,x_actual):
     for ubicacion in range(len(array)):
         if x_actual>array[ubicacion][0]:
             y=(  (array[ubicacion+1][1]-array[ubicacion][1])/(array[ubicacion+1][0]-array[ubicacion][0]))*(x_actual-array[ubicacion][0])+array[ubicacion][1]
-    print(x_actual)
     return y
 
 def derivada_funcion(array,x_actual):
@@ -113,7 +112,7 @@ def createCar():
     
 
     humano=sg.SceneGraphNode("humano")
-    humano.transform=tr.scale(1,1.3,1)
+    humano.transform=tr.scale(1,1.5,1)
     humano.childs+=[cuerpo]
 
 
@@ -178,6 +177,7 @@ def createCars(N):
 def createBackground():                    
     textura = es.toGPUShape(bs.createTextureQuad("fondo.jpg", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
     background = sg.SceneGraphNode("background")
+    background.transform=tr.uniformScale(2)
     background.childs += [textura]
     return background
 
@@ -247,7 +247,7 @@ if __name__ == "__main__":
         if control.salto==True:                                                                 #Salto
             print('salto')
             control.posicion_inicial=control.y
-            control.vy=0.08
+            control.vy=0.04
             control.salto=False
             control.saltando=True
 
@@ -278,7 +278,7 @@ if __name__ == "__main__":
             control.y=funcion_funcion(lista_coordenada,control.x)
 
         if control.saltando and (control.y-control.posicion_inicial>3):    #Caída
-            control.vy=-0.06
+            control.vy=-0.04
 
         if not control.saltando and not control.salto:                              #Si no salta ni cae, sigue el camino
             control.y=funcion_funcion(lista_coordenada,control.x)
