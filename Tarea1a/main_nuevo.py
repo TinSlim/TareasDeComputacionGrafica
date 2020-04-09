@@ -13,8 +13,8 @@ import Modulo.easy_shaders as es
 import Modulo.ex_curves as curves
 
 """Módulos mios"""
-import csvtolist_nuevo as ctl
-import curvas as crv
+import Modulo.csvtolist_nuevo as ctl
+import Modulo.curvas as crv
 
 
 
@@ -32,7 +32,6 @@ curvas_y_rectas=crv.curvas_rectas(separadas)
 camino_final=crv.concatenacion(curvas_y_rectas)
 
 camino_final=ctl.ponderar_parseado_numpy_y(camino_final,maximo)
-print(camino_final)
 
 
 
@@ -156,6 +155,7 @@ class Controller():
     salto=False
     saltando=False
     derivada=0
+    cayendo=False
     x=0
     y=0
     vy=0
@@ -239,23 +239,36 @@ if __name__ == "__main__":
         # Clearing the screen in both, color and depth
         glClear(GL_COLOR_BUFFER_BIT)
 
-        if control.salto==True:                                                                 #Salto
-            print('salto')
+
+        if control.salto and not control.saltando and not control.cayendo:
             control.posicion_inicial=control.y
-            control.vy=0.04
-            control.salto=False
+            control.vy=0.005
             control.saltando=True
+            control.salto=False
 
-        if control.saltando and (control.y-control.posicion_inicial>3):    #Caída
-            control.vy=-0.04
+        elif control.saltando:
+                control.vy=0.005
+                if (control.y-control.posicion_inicial)>0.5:
+                    control.saltando=False
+                    control.cayendo=True
+                    control.vy=-0.005
 
-        #if camino_final[contador_posicion_x][1]-control.y>5:
-        #    print("moriste")
-        
+        elif control.cayendo and not control.saltando:
+            control.vy=-0.005
+            if abs(control.y-camino_final[contador_posicion_x][1])<0.02:
+                control.vy=0
+                control.y=camino_final[contador_posicion_x][1]
+                control.cayendo=False
+
+        elif abs(control.y -camino_final[contador_posicion_x][1])>1:
+            control.vy=-0.02
+
+            control.cayendo=True
+
         else:
             control.y=camino_final[contador_posicion_x][1]
-
         control.y=control.y+control.vy
+
 
         
         contador_posicion_x+=1
