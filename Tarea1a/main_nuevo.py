@@ -257,7 +257,7 @@ if __name__ == "__main__":
     espacios_salto=0
 
     contador_posicion_x=0
-    posicion_actual=camino_final[0][1]
+    posicion_actual=camino_final[0][0]
     control.x=posicion_actual
 
 
@@ -269,6 +269,22 @@ if __name__ == "__main__":
         glClear(GL_COLOR_BUFFER_BIT)
 
 
+        #Manejo de la rotación del carrito::::::::::::
+            #Por si queda un número dividido en 0, como en los agujeros
+        if camino_final[contador_posicion_x+1][0]-camino_final[contador_posicion_x][0]==0  :
+            derivada=0
+        else:
+            derivada=(  camino_final[contador_posicion_x+1][1]-camino_final[contador_posicion_x][1]  )/   (camino_final[contador_posicion_x+1][0]-camino_final[contador_posicion_x][0]  )
+        
+        if control.derivada <derivada:
+            control.derivada+=0.000001
+        elif control.derivada>derivada:
+            derivada-=0.000001
+        control.derivada=derivada
+        angulo=np.arctan(derivada)
+
+
+        #Manejo del salto y restricciones:::::::::::::
         if control.salto and not control.saltando and not control.cayendo:
             control.posicion_inicial=control.y
             control.vy=0.005
@@ -291,14 +307,13 @@ if __name__ == "__main__":
 
         elif abs(control.y -camino_final[contador_posicion_x][1])>1:
             control.vy=-0.02
-
+            print("Muerto")
             control.cayendo=True
 
         else:
             control.y=camino_final[contador_posicion_x][1]
         control.y=control.y+control.vy
 
-        print(camino_final[contador_posicion_x][0])
 
         
         contador_posicion_x+=1
@@ -306,7 +321,9 @@ if __name__ == "__main__":
         x_pista-=espacios_salto
 
         pista.transform=tr.translate(x_pista,-0.4,0)
-        auto.transform=tr.matmul([tr.translate(0,(control.y)-0.4,0),tr.uniformScale(0.2)])
+
+        auto.transform=tr.matmul([tr.translate(0,(control.y)-(0.35),0),tr.uniformScale(0.2),tr.rotationZ(angulo)])
+        
         fondo.transform=tr.matmul([tr.translate(x_pista%1+0.5,0,0),tr.scale(1,2,1)])
         fondo1.transform=tr.matmul([tr.translate(x_pista%1,0,0),tr.scale(1,2,1)])
         fondo2.transform=tr.matmul([tr.translate(x_pista%1-0.5,0,0),tr.scale(1,2,1)])
