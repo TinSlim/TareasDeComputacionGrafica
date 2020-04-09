@@ -23,6 +23,20 @@ parse=ctl.parsear_archivo("datos.csv")
 lista_de_x=ctl.encontrar_x(parse)
 parse_sin_x=ctl.quitar_x(parse)
 
+parse_sin_x2=[]
+parse_sin_x2.append([-1,2])
+n=0
+while n<len(parse_sin_x):
+    parse_sin_x2.append(parse_sin_x[n])
+    n+=1
+parse_sin_x2.append([n,1])
+parse_sin_x2.append([n+1,1])
+parse_sin_x2.append([n+2,1])
+parse_sin_x2.append([n+3,1])
+parse_sin_x2.append([n+4,1])
+
+parse_sin_x=parse_sin_x2
+
 #Factor que pondera (max altura)
 maximo=ctl.maximo_y(parse_sin_x)
 
@@ -33,9 +47,14 @@ camino_final=crv.concatenacion(curvas_y_rectas)
 
 camino_final=ctl.ponderar_parseado_numpy_y(camino_final,maximo)
 
+def createBackground():                    
+    textura = es.toGPUShape(bs.createTextureQuad("fondo_vigas.jpg", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
+    background = sg.SceneGraphNode("background")
+    background.transform=tr.scale(1,2,1)
+    background.childs += [textura]
+    return background
 
-
-def createPistaShape(lista):
+def createPistaShape(lista,R,G,B):
 
     # Defining the location and colors of each vertex  of the shape
     vertices=[]
@@ -43,16 +62,16 @@ def createPistaShape(lista):
         vertices.append((punto[0]))
         vertices.append((punto[1]))
         vertices.append((punto[2]))
-        vertices.append(1)
-        vertices.append(0)
-        vertices.append(0) 
+        vertices.append(R)
+        vertices.append(G)
+        vertices.append(B) 
 
         vertices.append((punto[0]))
-        vertices.append((-10))   ###########
+        vertices.append((2))   ###########
         vertices.append((punto[2]))
-        vertices.append(1)
-        vertices.append(0)
-        vertices.append(0) 
+        vertices.append(R)
+        vertices.append(G)
+        vertices.append(B) 
     
     indices=[]
     puntos=len(lista)
@@ -62,8 +81,6 @@ def createPistaShape(lista):
        indices.append(n+1)
        indices.append(n+2)
        n+=1
-
-    
 
     # Defining connections among vertices
     # We have a triangle every 3 indices specified
@@ -144,10 +161,17 @@ def createCar():
     return traslatedCar
 
 def createPista():
-    cuboGPU=es.toGPUShape(createPistaShape(camino_final))
+    cuboGPU2=es.toGPUShape(createPistaShape(camino_final,0,0,0))
+    cuboGPU1=es.toGPUShape(createPistaShape(camino_final,0.5254,0.8196,0.98030))
+    pista1=sg.SceneGraphNode("pista1")
+    pista1.transform=tr.translate(0,0.01,0)
+    pista2=sg.SceneGraphNode("pista2")
+    pista1.childs+=[cuboGPU1]
+    pista2.childs+=[cuboGPU2]
     pista = sg.SceneGraphNode("pista")
     pista.transform=tr.identity()
-    pista.childs+=[cuboGPU]
+    pista.childs+=[pista2]
+    pista.childs+=[pista1]
     return pista
 
 
@@ -215,7 +239,12 @@ if __name__ == "__main__":
     # Creating shapes on GPU memory
     auto=createCar()
     pista=createPista()
-
+    fondo=createBackground()        
+    fondo1=createBackground()
+    fondo2=createBackground()
+    fondo3=createBackground()
+    fondo4=createBackground()
+    
     # Our shapes here are always fully painted
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
@@ -269,19 +298,34 @@ if __name__ == "__main__":
             control.y=camino_final[contador_posicion_x][1]
         control.y=control.y+control.vy
 
+        print(camino_final[contador_posicion_x][0])
 
         
         contador_posicion_x+=1
         espacios_salto=camino_final[contador_posicion_x][0]-camino_final[contador_posicion_x-1][0]
         x_pista-=espacios_salto
 
-        pista.transform=tr.translate(x_pista,0,0)
-        auto.transform=tr.matmul([tr.translate(0,(control.y),0),tr.uniformScale(0.2)])
+        pista.transform=tr.translate(x_pista,-0.4,0)
+        auto.transform=tr.matmul([tr.translate(0,(control.y)-0.4,0),tr.uniformScale(0.2)])
+        fondo.transform=tr.matmul([tr.translate(x_pista%1+0.5,0,0),tr.scale(1,2,1)])
+        fondo1.transform=tr.matmul([tr.translate(x_pista%1,0,0),tr.scale(1,2,1)])
+        fondo2.transform=tr.matmul([tr.translate(x_pista%1-0.5,0,0),tr.scale(1,2,1)])
+        fondo3.transform=tr.matmul([tr.translate(x_pista%1-1,0,0),tr.scale(1,2,1)])
+        fondo4.transform=tr.matmul([tr.translate(x_pista%1-1.5,0,0),tr.scale(1,2,1)])
+
+        glUseProgram(pipeline2.shaderProgram)
+        sg.drawSceneGraphNode(fondo, pipeline2, "transform")
+        sg.drawSceneGraphNode(fondo1, pipeline2, "transform")
+        sg.drawSceneGraphNode(fondo2, pipeline2, "transform")
+        sg.drawSceneGraphNode(fondo3, pipeline2, "transform")
+        sg.drawSceneGraphNode(fondo4, pipeline2, "transform")
+
         glUseProgram(pipeline.shaderProgram)
         sg.drawSceneGraphNode(pista, pipeline, "transform")
 
         glUseProgram(pipeline2.shaderProgram)
         sg.drawSceneGraphNode(auto, pipeline2, "transform")
+        
 
 
 
