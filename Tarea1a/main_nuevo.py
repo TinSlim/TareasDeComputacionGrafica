@@ -31,21 +31,25 @@ while n<len(parse_sin_x):
     n+=1
 parse_sin_x2.append([n,1])
 parse_sin_x2.append([n+1,1])
-parse_sin_x2.append([n+2,1])
+parse_sin_x2.append([n+2,3])
 parse_sin_x2.append([n+3,1])
-parse_sin_x2.append([n+4,1])
-
-parse_sin_x=parse_sin_x2
+parse_sin_x2.append([n+4,3])
+parse_sin_x2.append([n+5,1])
+parse_sin_x2.append([n+5,5])
 
 #Factor que pondera (max altura)
-maximo=ctl.maximo_y(parse_sin_x)
+maximo=ctl.maximo_y(parse_sin_x2)
 
 #Armar curvas
-separadas=crv.separador_de_curvas(parse_sin_x,lista_de_x)
+separadas=crv.separador_de_curvas(parse_sin_x2,lista_de_x)
 curvas_y_rectas=crv.curvas_rectas(separadas)
 camino_final=crv.concatenacion(curvas_y_rectas)
+numero=0
 
 camino_final=ctl.ponderar_parseado_numpy_y(camino_final,maximo)
+
+
+
 
 def createBackground():                    
     textura = es.toGPUShape(bs.createTextureQuad("fondo_vigas.jpg", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
@@ -55,33 +59,47 @@ def createBackground():
     return background
 
 def createPistaShape(lista,R,G,B):
-
     # Defining the location and colors of each vertex  of the shape
+    
     vertices=[]
     for punto in lista:
-        vertices.append((punto[0]))
-        vertices.append((punto[1]))
-        vertices.append((punto[2]))
-        vertices.append(R)
-        vertices.append(G)
-        vertices.append(B) 
 
         vertices.append((punto[0]))
         vertices.append((2))   ###########
         vertices.append((punto[2]))
         vertices.append(R)
         vertices.append(G)
+        vertices.append(B)
+
+        vertices.append((punto[0]))
+        vertices.append((punto[1]))
+        vertices.append((punto[2]))
+        vertices.append(R)
+        vertices.append(G)
         vertices.append(B) 
-    
+ 
+
+    #n=0
+    #while n<len(vertices):
+        #print(vertices[n])
+        #n+=6
+    #for punto in vertices:
+     #   if punto[0]>numero:
+      #      numero+=1
+       #     print(numero,"+1")
+        #elif punto[0]<numero:
+         #   numero-=1
+          #  print(numero,"-1")
+
     indices=[]
-    puntos=len(lista)
+    puntos=len(vertices)/6
     n=0
     while n<puntos-2:
        indices.append(n)
        indices.append(n+1)
        indices.append(n+2)
        n+=1
-
+    
     # Defining connections among vertices
     # We have a triangle every 3 indices specified
     return bs.Shape(vertices, indices)
@@ -162,7 +180,7 @@ def createCar():
 
 def createPista():
     cuboGPU2=es.toGPUShape(createPistaShape(camino_final,0,0,0))
-    cuboGPU1=es.toGPUShape(createPistaShape(camino_final,0.5254,0.8196,0.98030))
+    cuboGPU1=es.toGPUShape(createPistaShape(camino_final,0.5254,0.8196,0.98030))#############
     pista1=sg.SceneGraphNode("pista1")
     pista1.transform=tr.translate(0,0.01,0)
     pista2=sg.SceneGraphNode("pista2")
@@ -239,6 +257,9 @@ if __name__ == "__main__":
     # Creating shapes on GPU memory
     auto=createCar()
     pista=createPista()
+    
+
+
     fondo=createBackground()        
     fondo1=createBackground()
     fondo2=createBackground()
@@ -268,6 +289,7 @@ if __name__ == "__main__":
         # Clearing the screen in both, color and depth
         glClear(GL_COLOR_BUFFER_BIT)
 
+        print(control.x,control.y)
 
         #Manejo de la rotación del carrito::::::::::::
             #Por si queda un número dividido en 0, como en los agujeros
