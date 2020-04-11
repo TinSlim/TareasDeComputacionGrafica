@@ -31,11 +31,7 @@ while n<len(parse_sin_x):
     n+=1
 parse_sin_x2.append([n,1])
 parse_sin_x2.append([n+1,1])
-parse_sin_x2.append([n+2,3])
-parse_sin_x2.append([n+3,1])
-parse_sin_x2.append([n+4,3])
-parse_sin_x2.append([n+5,1])
-parse_sin_x2.append([n+5,5])
+
 
 #Factor que pondera (max altura)
 maximo=ctl.maximo_y(parse_sin_x2)
@@ -192,6 +188,11 @@ def createPista():
     pista.childs+=[pista1]
     return pista
 
+def create_big_quad():
+    quadGPU=es.toGPUShape(bs.createColorQuad(0.5254,0.8196,0.98030))
+    quad=sg.SceneGraphNode("Cuadrado")
+    quad.childs+=[quadGPU]
+    return quad
 
 class Controller():
     salto=False
@@ -257,6 +258,7 @@ if __name__ == "__main__":
     # Creating shapes on GPU memory
     auto=createCar()
     pista=createPista()
+    cuadrado=create_big_quad()
     
 
 
@@ -289,7 +291,6 @@ if __name__ == "__main__":
         # Clearing the screen in both, color and depth
         glClear(GL_COLOR_BUFFER_BIT)
 
-        print(control.x,control.y)
 
         #Manejo de la rotación del carrito::::::::::::
             #Por si queda un número dividido en 0, como en los agujeros
@@ -307,11 +308,14 @@ if __name__ == "__main__":
 
 
         #Manejo del salto y restricciones:::::::::::::
-        if control.salto and not control.saltando and not control.cayendo:
-            control.posicion_inicial=control.y
-            control.vy=0.005
-            control.saltando=True
+        if control.salto:
+            if not control.saltando and not control.cayendo:
+                control.posicion_inicial=control.y
+                control.vy=0.005
+                control.saltando=True
             control.salto=False
+        
+    
 
         elif control.saltando:
                 control.vy=0.005
@@ -327,6 +331,8 @@ if __name__ == "__main__":
                 control.y=camino_final[contador_posicion_x][1]
                 control.cayendo=False
 
+
+        #TODO Arreglar el caso de muerte
         elif abs(control.y -camino_final[contador_posicion_x][1])>1:
             control.vy=-0.02
             print("Muerto")
@@ -352,6 +358,8 @@ if __name__ == "__main__":
         fondo3.transform=tr.matmul([tr.translate(x_pista%1-1,0,0),tr.scale(1,2,1)])
         fondo4.transform=tr.matmul([tr.translate(x_pista%1-1.5,0,0),tr.scale(1,2,1)])
 
+        cuadrado.transform=tr.matmul([tr.translate(x_pista-1,0,0),tr.scale(2,2,1),tr.identity()])
+
         glUseProgram(pipeline2.shaderProgram)
         sg.drawSceneGraphNode(fondo, pipeline2, "transform")
         sg.drawSceneGraphNode(fondo1, pipeline2, "transform")
@@ -361,6 +369,7 @@ if __name__ == "__main__":
 
         glUseProgram(pipeline.shaderProgram)
         sg.drawSceneGraphNode(pista, pipeline, "transform")
+        sg.drawSceneGraphNode(cuadrado, pipeline, "transform")
 
         glUseProgram(pipeline2.shaderProgram)
         sg.drawSceneGraphNode(auto, pipeline2, "transform")
