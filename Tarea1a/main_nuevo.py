@@ -10,7 +10,6 @@ import Modulo.transformations as tr
 import Modulo.basic_shapes as bs
 import Modulo.scene_graph as sg
 import Modulo.easy_shaders as es
-import Modulo.ex_curves as curves
 
 """Módulos mios"""
 import Modulo.csvtolist_nuevo as ctl
@@ -30,8 +29,7 @@ while n<len(parse_sin_x):
     parse_sin_x2.append(parse_sin_x[n])
     n+=1
 parse_sin_x2.append([n,1])
-parse_sin_x2.append([n+1,1])
-
+ultima_coordenada=parse_sin_x2[len(parse_sin_x2)-2]
 
 #Factor que pondera (max altura)
 maximo=ctl.maximo_y(parse_sin_x2)
@@ -101,9 +99,9 @@ def createPistaShape(lista,R,G,B):
     return bs.Shape(vertices, indices)
 
 def createCar():
-    gpuTorso = es.toGPUShape(bs.createTextureQuad("monito.png", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
-    gpuHombro = es.toGPUShape(bs.createTextureQuad("hombro.png", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
-    gpuAntebrazo = es.toGPUShape(bs.createTextureQuad("antebrazo.png", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
+    gpuTorso = es.toGPUShape(bs.createTextureQuad("Imagenes/monito.png", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
+    gpuHombro = es.toGPUShape(bs.createTextureQuad("Imagenes/hombro.png", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
+    gpuAntebrazo = es.toGPUShape(bs.createTextureQuad("Imagenes/antebrazo.png", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
 
     antebrazo = sg.SceneGraphNode("antebrazo")
     antebrazo.transform=tr.matmul([tr.translate(0.65,-0.25,0),tr.rotationZ(1.3),tr.scale(0.45,0.86,1)])
@@ -139,7 +137,7 @@ def createCar():
 
     ######################
     gpuBlackQuad = es.toGPUShape(bs.createTextureQuad("rueda.png", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
-    gpuRedQuad = es.toGPUShape(bs.createTextureQuad("carrito.png", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
+    gpuRedQuad = es.toGPUShape(bs.createTextureQuad("Imagenes/carrito.png", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
 
     # Creating a single wheel
     wheel = sg.SceneGraphNode("wheel")
@@ -194,6 +192,8 @@ def create_big_quad():
     quad.childs+=[quadGPU]
     return quad
 
+
+
 class Controller():
     salto=False
     saltando=False
@@ -204,6 +204,7 @@ class Controller():
     vy=0
     g=9
 
+    accidente=False
     posicion_inicial=0
 
 control=Controller()
@@ -259,7 +260,7 @@ if __name__ == "__main__":
     auto=createCar()
     pista=createPista()
     cuadrado=create_big_quad()
-    
+    cuadrado2=create_big_quad()
 
 
     fondo=createBackground()        
@@ -294,15 +295,22 @@ if __name__ == "__main__":
 
         #Manejo de la rotación del carrito::::::::::::
             #Por si queda un número dividido en 0, como en los agujeros
+        if (control.y)-(0.34)-0.5<-3:
+            control.accidente=True
+            print("NOT SAFE")
+        if control.accidente:
+            sys.exit()
+        
+
         if camino_final[contador_posicion_x+1][0]-camino_final[contador_posicion_x][0]==0  :
             derivada=0
         else:
             derivada=(  camino_final[contador_posicion_x+1][1]-camino_final[contador_posicion_x][1]  )/   (camino_final[contador_posicion_x+1][0]-camino_final[contador_posicion_x][0]  )
         
         if control.derivada <derivada:
-            control.derivada+=0.000001
+            control.derivada+=0.0000000000000000000000000000000000000000000000000000001
         elif control.derivada>derivada:
-            derivada-=0.000001
+            derivada-=0.0000000000000000000000000000000000000000000000000000001
         control.derivada=derivada
         angulo=np.arctan(derivada)
 
@@ -333,10 +341,6 @@ if __name__ == "__main__":
 
 
         #TODO Arreglar el caso de muerte
-        elif abs(control.y -camino_final[contador_posicion_x][1])>1:
-            control.vy=-0.02
-            print("Muerto")
-            control.cayendo=True
 
         else:
             control.y=camino_final[contador_posicion_x][1]
@@ -348,9 +352,9 @@ if __name__ == "__main__":
         espacios_salto=camino_final[contador_posicion_x][0]-camino_final[contador_posicion_x-1][0]
         x_pista-=espacios_salto
 
-        pista.transform=tr.translate(x_pista,-0.4,0)
+        pista.transform=tr.translate(x_pista,-0.4-0.5,0)
 
-        auto.transform=tr.matmul([tr.translate(0,(control.y)-(0.35),0),tr.uniformScale(0.2),tr.rotationZ(angulo)])
+        auto.transform=tr.matmul([tr.translate(0,(control.y)-(0.34)-0.5,0),tr.uniformScale(0.2),tr.rotationZ(angulo)])
         
         fondo.transform=tr.matmul([tr.translate(x_pista%1+0.5,0,0),tr.scale(1,2,1)])
         fondo1.transform=tr.matmul([tr.translate(x_pista%1,0,0),tr.scale(1,2,1)])
@@ -359,6 +363,10 @@ if __name__ == "__main__":
         fondo4.transform=tr.matmul([tr.translate(x_pista%1-1.5,0,0),tr.scale(1,2,1)])
 
         cuadrado.transform=tr.matmul([tr.translate(x_pista-1,0,0),tr.scale(2,2,1),tr.identity()])
+        cuadrado2.transform=tr.matmul([tr.translate(x_pista+1+ultima_coordenada[0],0,0),tr.scale(2,2,1),tr.identity()])
+
+        
+
 
         glUseProgram(pipeline2.shaderProgram)
         sg.drawSceneGraphNode(fondo, pipeline2, "transform")
@@ -370,6 +378,7 @@ if __name__ == "__main__":
         glUseProgram(pipeline.shaderProgram)
         sg.drawSceneGraphNode(pista, pipeline, "transform")
         sg.drawSceneGraphNode(cuadrado, pipeline, "transform")
+        sg.drawSceneGraphNode(cuadrado2, pipeline, "transform")
 
         glUseProgram(pipeline2.shaderProgram)
         sg.drawSceneGraphNode(auto, pipeline2, "transform")
