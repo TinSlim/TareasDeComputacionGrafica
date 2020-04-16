@@ -192,6 +192,11 @@ def create_big_quad():
     quad.childs+=[quadGPU]
     return quad
 
+def sol():
+    solGPU=es.toGPUShape(bs.createTextureQuad("sol.png"),GL_REPEAT,GL_LINEAR)
+    sun=sg.SceneGraphNode("Cuadrado")
+    sun.childs+=[solGPU]
+    return sun
 
 
 class Controller():
@@ -262,6 +267,7 @@ if __name__ == "__main__":
     cuadrado=create_big_quad()
     cuadrado2=create_big_quad()
 
+    sun=sol()
 
     fondo=createBackground()        
     fondo1=createBackground()
@@ -381,6 +387,9 @@ if __name__ == "__main__":
         fondo3.transform=tr.matmul([tr.translate(x_pista%1-1,0,0),tr.scale(1,2,1)])
         fondo4.transform=tr.matmul([tr.translate(x_pista%1-1.5,0,0),tr.scale(1,2,1)])
 
+        sun.transform=tr.matmul([tr.translate(1,1,0),tr.uniformScale(1.3)])
+
+
         cuadrado.transform=tr.matmul([tr.translate(x_pista-1,0,0),tr.scale(2,2,1),tr.identity()])
         cuadrado2.transform=tr.matmul([tr.translate(x_pista+1+ultima_coordenada[0],0,0),tr.scale(2,2,1),tr.identity()])
 
@@ -393,13 +402,17 @@ if __name__ == "__main__":
         sg.drawSceneGraphNode(fondo2, pipeline2, "transform")
         sg.drawSceneGraphNode(fondo3, pipeline2, "transform")
         sg.drawSceneGraphNode(fondo4, pipeline2, "transform")
+        
 
         glUseProgram(pipeline.shaderProgram)
         sg.drawSceneGraphNode(pista, pipeline, "transform")
         sg.drawSceneGraphNode(cuadrado, pipeline, "transform")
         sg.drawSceneGraphNode(cuadrado2, pipeline, "transform")
 
+        
+
         glUseProgram(pipeline2.shaderProgram)
+        sg.drawSceneGraphNode(sun,pipeline2,"transform")
         sg.drawSceneGraphNode(auto, pipeline2, "transform")
         
 
