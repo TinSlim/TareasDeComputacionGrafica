@@ -193,7 +193,7 @@ def create_big_quad():
     return quad
 
 def sol():
-    solGPU=es.toGPUShape(bs.createTextureQuad("sol.png"),GL_REPEAT,GL_LINEAR)
+    solGPU=es.toGPUShape(bs.createTextureQuad("Imagenes/sol.png"),GL_REPEAT,GL_LINEAR)
     sun=sg.SceneGraphNode("Cuadrado")
     sun.childs+=[solGPU]
     return sun
