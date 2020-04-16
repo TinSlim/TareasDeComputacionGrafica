@@ -198,6 +198,8 @@ def sol():
     sun.childs+=[solGPU]
     return sun
 
+#a
+#a
 
 class Controller():
     salto=False
