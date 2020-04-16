@@ -46,7 +46,7 @@ camino_final=ctl.ponderar_parseado_numpy_y(camino_final,maximo)
 
 
 def createBackground():                    
-    textura = es.toGPUShape(bs.createTextureQuad("fondo_vigas.jpg", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
+    textura = es.toGPUShape(bs.createTextureQuad("Imagenes/fondo_vigas.jpg", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
     background = sg.SceneGraphNode("background")
     background.transform=tr.scale(1,2,1)
     background.childs += [textura]
@@ -276,10 +276,11 @@ if __name__ == "__main__":
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     
-    #traslacion pista
+    #Contadores iniciales; posición pista, desplazamiento pista
     x_pista=0
     espacios_salto=0
 
+    #Contador puntero lista coordenadas de la montaña rusa, ubicación inicial.
     contador_posicion_x=0
     posicion_actual=camino_final[0][0]
     control.x=posicion_actual
@@ -293,20 +294,14 @@ if __name__ == "__main__":
         glClear(GL_COLOR_BUFFER_BIT)
 
 
-        #Manejo de la rotación del carrito::::::::::::
-            #Por si queda un número dividido en 0, como en los agujeros
-        if (control.y)-(0.34)-0.5<-3:
-            control.accidente=True
-            print("NOT SAFE")
-        if control.accidente:
-            sys.exit()
-        
-
+        #:::::::::::::::::::::::::::::::::::::::::::::::::::::::.Manejo de la rotación del carrito::::::::::::
+        #Por si queda un número dividido en 0, como en los agujeros
         if camino_final[contador_posicion_x+1][0]-camino_final[contador_posicion_x][0]==0  :
             derivada=0
         else:
             derivada=(  camino_final[contador_posicion_x+1][1]-camino_final[contador_posicion_x][1]  )/   (camino_final[contador_posicion_x+1][0]-camino_final[contador_posicion_x][0]  )
         
+        #Variacion derivada
         if control.derivada <derivada:
             control.derivada+=0.0000000000000000000000000000000000000000000000000000001
         elif control.derivada>derivada:
@@ -315,7 +310,26 @@ if __name__ == "__main__":
         angulo=np.arctan(derivada)
 
 
-        #Manejo del salto y restricciones:::::::::::::
+            
+
+        #:::::::::::::::::::Condiciones según posición o estados del control:::::::::::::::::
+        #Caso Accidente
+        if (control.y)-(0.34)-0.5<-3:
+            control.accidente=True
+            print("NOT SAFE")
+        
+        if control.accidente:
+            sys.exit()
+        
+        #Caso de terminar el camino
+        try:
+            camino_final[contador_posicion_x+1][0]-camino_final[contador_posicion_x][0]
+        except:
+            print("Ganaste")
+            sys.exit()
+
+
+        #Manejo del salto y restricciones
         if control.salto:
             if not control.saltando and not control.cayendo:
                 control.posicion_inicial=control.y
@@ -324,7 +338,6 @@ if __name__ == "__main__":
             control.salto=False
         
     
-
         elif control.saltando:
                 control.vy=0.005
                 if (control.y-control.posicion_inicial)>0.5:
@@ -340,18 +353,24 @@ if __name__ == "__main__":
                 control.cayendo=False
 
 
-        #TODO Arreglar el caso de muerte
+        elif control.y-camino_final[contador_posicion_x+1][1]>0.3:
+            control.cayendo=True
 
+        #Si no paso ninguno de los anteriores, está en el camino
         else:
             control.y=camino_final[contador_posicion_x][1]
+
+        #Renovar posición Y
         control.y=control.y+control.vy
 
-
-        
+        #Avanzar posición X
         contador_posicion_x+=1
+
+        #Lo que desplaza la montaña rusa cada fotograma y actualización de su posición
         espacios_salto=camino_final[contador_posicion_x][0]-camino_final[contador_posicion_x-1][0]
         x_pista-=espacios_salto
 
+        #:::::::::::::::::Transformaciones:::::::::::::::::
         pista.transform=tr.translate(x_pista,-0.4-0.5,0)
 
         auto.transform=tr.matmul([tr.translate(0,(control.y)-(0.34)-0.5,0),tr.uniformScale(0.2),tr.rotationZ(angulo)])
@@ -367,7 +386,7 @@ if __name__ == "__main__":
 
         
 
-
+        #::::::::::::::::::Dibujado::::::::::::::::::::
         glUseProgram(pipeline2.shaderProgram)
         sg.drawSceneGraphNode(fondo, pipeline2, "transform")
         sg.drawSceneGraphNode(fondo1, pipeline2, "transform")
