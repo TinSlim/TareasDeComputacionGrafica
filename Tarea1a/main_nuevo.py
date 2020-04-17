@@ -15,10 +15,14 @@ import Modulo.easy_shaders as es
 import Modulo.csvtolist_nuevo as ctl
 import Modulo.curvas as crv
 
-
+#Se recoge entrada
+try:
+    archivo_csv=str(sys.argv[1])
+except:
+    archivo_csv="datos.csv"
 
 #Parsear el csv
-parse=ctl.parsear_archivo("datos.csv")
+parse=ctl.parsear_archivo(archivo_csv)
 lista_de_x=ctl.encontrar_x(parse)
 parse_sin_x=ctl.quitar_x(parse)
 
@@ -72,19 +76,6 @@ def createPistaShape(lista,R,G,B):
         vertices.append(G)
         vertices.append(B) 
  
-
-    #n=0
-    #while n<len(vertices):
-        #print(vertices[n])
-        #n+=6
-    #for punto in vertices:
-     #   if punto[0]>numero:
-      #      numero+=1
-       #     print(numero,"+1")
-        #elif punto[0]<numero:
-         #   numero-=1
-          #  print(numero,"-1")
-
     indices=[]
     puntos=len(vertices)/6
     n=0
@@ -94,8 +85,7 @@ def createPistaShape(lista,R,G,B):
        indices.append(n+2)
        n+=1
     
-    # Defining connections among vertices
-    # We have a triangle every 3 indices specified
+
     return bs.Shape(vertices, indices)
 
 def createCar():
