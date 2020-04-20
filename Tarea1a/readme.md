@@ -9,3 +9,5 @@
     1) El carrito se moverá solo a través de la montaña rusa, para saltar se debe apretar la barra espaciadora.
     2)El juego termina si ocurre un accidente (Caer por un corte de la pista) o bien recorrer toda la pista.
 
+    
+
