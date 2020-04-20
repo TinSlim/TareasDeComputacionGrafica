@@ -132,7 +132,7 @@ def createCar():
     # Creating a single wheel
     wheel = sg.SceneGraphNode("wheel")
     wheel.transform = tr.uniformScale(0.2)
-    wheel.childs += [gpuBlackQuad]
+    #wheel.childs += [gpuBlackQuad]
 
     wheelRotation = sg.SceneGraphNode("wheelRotation")
     wheelRotation.childs += [wheel]
@@ -188,8 +188,6 @@ def sol():
     sun.childs+=[solGPU]
     return sun
 
-#a
-#a
 
 class Controller():
     salto=False
@@ -291,6 +289,12 @@ if __name__ == "__main__":
         # Clearing the screen in both, color and depth
         glClear(GL_COLOR_BUFFER_BIT)
 
+        #Caso de terminar el camino
+        try:
+            camino_final[contador_posicion_x+1][0]-camino_final[contador_posicion_x][0]
+        except:
+            print("Ganaste")
+            sys.exit()
 
         #:::::::::::::::::::::::::::::::::::::::::::::::::::::::.Manejo de la rotación del carrito::::::::::::
         #Por si queda un número dividido en 0, como en los agujeros
@@ -298,6 +302,7 @@ if __name__ == "__main__":
             derivada=0
         else:
             derivada=(  camino_final[contador_posicion_x+1][1]-camino_final[contador_posicion_x][1]  )/   (camino_final[contador_posicion_x+1][0]-camino_final[contador_posicion_x][0]  )
+        
         
         #Variacion derivada
         if control.derivada <derivada:
@@ -319,12 +324,6 @@ if __name__ == "__main__":
         if control.accidente:
             sys.exit()
         
-        #Caso de terminar el camino
-        try:
-            camino_final[contador_posicion_x+1][0]-camino_final[contador_posicion_x][0]
-        except:
-            print("Ganaste")
-            sys.exit()
 
 
         #Manejo del salto y restricciones
