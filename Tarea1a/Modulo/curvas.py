@@ -69,7 +69,7 @@ def curvas_rectas(curvas_separadas):
                 m+=1
             m=0
         else:
-            ts = np.linspace(curvas_separadas[n][0][0],curvas_separadas[n][1][0], 70)   #tambien implica velocidad
+            ts = np.linspace(curvas_separadas[n][0][0],curvas_separadas[n][1][0], 80)   #tambien implica velocidad
             arreglo=[]
             for x in ts:
                 arreglo.append([x,-10,0])
