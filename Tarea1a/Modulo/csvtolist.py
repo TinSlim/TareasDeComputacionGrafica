@@ -39,6 +39,19 @@ def agregar_coord_z(lista):
             coordenada.append(0)
     return lista
 
+def agregar_coord_z2(lista):
+    total=[]
+    curve=[]
+    coor=[]
+    for curva in lista:
+        for coordenada in curva:
+            curve.append(np.array([[coordenada[0],coordenada[1],0]]).T)
+        total.append(curve)
+        curve=[]
+    return total            
+
+
+
 ###Primero parseado, luego parseado_coordenada
 
 def list_to_numpy(lista):
@@ -64,13 +77,13 @@ def crater(lista,lista_x):
     return salida                
 
 
-a=parsear("datos.csv")
+#a=parsear("datos.csv")
 
-b=parseado_coordenada(a)
-caidas=ubicacion_caidas(a)
+#b=parseado_coordenada(a)
+#caidas=ubicacion_caidas(a)
 
-hoyos=crater(b,caidas)
-print(hoyos)
-c=agregar_coord_z(hoyos)
+#hoyos=crater(b,caidas)
+#print(hoyos)
+#c=agregar_coord_z(hoyos)
 
-print(c)
+#print(c)
