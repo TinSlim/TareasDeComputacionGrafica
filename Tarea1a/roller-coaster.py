@@ -230,7 +230,7 @@ if __name__ == "__main__":
     width = 700
     height = 700
 
-    window = glfw.create_window(width, height, "Roller Coaster of Death", None, None)
+    window = glfw.create_window(width, height, "Roller Coaster", None, None)
 
     if not window:
         glfw.terminate()
@@ -414,3 +414,5 @@ if __name__ == "__main__":
 
     
     glfw.terminate()
+
+    
