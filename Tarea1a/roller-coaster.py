@@ -1,3 +1,5 @@
+#Cristóbal Torres Gutiérrez
+
 """Módulos"""
 import glfw
 from OpenGL.GL import *
@@ -22,7 +24,7 @@ except:
     archivo_csv="datos.csv"
 
 
-#Parsear el csv, try por si no está el archivo pueda mostra uno de prueba.
+#Parsear el csv, try por si no está el archivo pueda mostra uno de prueba
 try:
     parse=ctl.parsear_archivo(archivo_csv)
 except:
