@@ -15,14 +15,19 @@ import Modulo.easy_shaders as es
 import Modulo.csvtolist_nuevo as ctl
 import Modulo.curvas as crv
 
-#Se recoge entrada
+#Se recoge entrada, try por si no está el archivo pueda mostra uno de prueba
 try:
     archivo_csv=str(sys.argv[1])
 except:
     archivo_csv="datos.csv"
 
-#Parsear el csv
-parse=ctl.parsear_archivo(archivo_csv)
+
+#Parsear el csv, try por si no está el archivo pueda mostra uno de prueba
+try:
+    parse=ctl.parsear_archivo(archivo_csv)
+except:
+    parse=ctl.parsear_archivo("datos.csv")
+
 lista_de_x=ctl.encontrar_x(parse)
 parse_sin_x=ctl.quitar_x(parse)
 
