@@ -26,7 +26,7 @@ def quitar_x_coord(a):
 #Quita las x y transforma a entero
 def quitar_x(parseado):
     l = []
-    for lista in parse:
+    for lista in parseado:
         l.append(list(map(quitar_x_coord, lista)))   
    # print(parse)
     return l 
@@ -45,8 +45,3 @@ def ponderar_parseado_numpy_y(lista,numero):
         lista[n][1]=(lista[n][1])/numero
         n+=1
     return lista 
-
-parse=parsear_archivo("datos.csv")
-print(encontrar_x(parse))
-
-print(quitar_x(parse))
