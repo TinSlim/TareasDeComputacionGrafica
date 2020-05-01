@@ -28,9 +28,9 @@ def quitar_x(parseado):
     l = []
     for lista in parseado:
         l.append(list(map(quitar_x_coord, lista)))   
-   # print(parse)
     return l 
-   
+
+#Obtiene el número máximo de coordenada Y para ajustar la proporción de la pista en la pantalla
 def maximo_y(parseado_sin_x):
     max=parseado_sin_x[0][1]
     for coordenada in parseado_sin_x:
