@@ -220,8 +220,6 @@ def on_key(window, key, scancode, action, mods):
     elif key == glfw.KEY_ESCAPE:
         sys.exit()
 
-    else:
-        print('Unknown key')
 
 
 
