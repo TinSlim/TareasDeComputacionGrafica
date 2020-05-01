@@ -9,5 +9,8 @@
     1) El carrito se moverá solo a través de la montaña rusa, para saltar se debe apretar la barra espaciadora.
     2)El juego termina si ocurre un accidente (Caer por un corte de la pista) o bien recorrer toda la pista.
 
+- Consideraciones y Supuestos
+    1)Usar números enteros positivos para coordenadas.
+    2)el juego ajusta su uso en la pantalla acorde a la mayor coordenada “Y” que recibe, prefiera números menores a 40.
     
 
