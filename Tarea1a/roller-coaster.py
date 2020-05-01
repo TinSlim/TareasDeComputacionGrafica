@@ -133,26 +133,8 @@ def createCar():
 
 
     ######################
-    gpuBlackQuad = es.toGPUShape(bs.createTextureQuad("rueda.png", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
     gpuRedQuad = es.toGPUShape(bs.createTextureQuad("Imagenes/carrito.png", nx=1, ny=1),GL_REPEAT,GL_LINEAR)
 
-    # Creating a single wheel
-    wheel = sg.SceneGraphNode("wheel")
-    wheel.transform = tr.uniformScale(0.2)
-    #wheel.childs += [gpuBlackQuad]
-
-    wheelRotation = sg.SceneGraphNode("wheelRotation")
-    wheelRotation.childs += [wheel]
-
-    # Instanciating 2 wheels, for the front and back parts
-    frontWheel = sg.SceneGraphNode("frontWheel")
-    frontWheel.transform = tr.translate(0.3,-0.3,0)
-    frontWheel.childs += [wheelRotation]
-
-    backWheel = sg.SceneGraphNode("backWheel")
-    backWheel.transform = tr.translate(-0.3,-0.3,0)
-    backWheel.childs += [wheelRotation]
-    
     # Creating the chasis of the car
     chasis = sg.SceneGraphNode("chasis")
     chasis.transform = tr.scale(1,0.5,1)
@@ -160,8 +142,7 @@ def createCar():
 
     car = sg.SceneGraphNode("car")
     car.childs += [chasis]
-    car.childs += [frontWheel]
-    car.childs += [backWheel]
+
 
     traslatedCar = sg.SceneGraphNode("traslatedCar")
     traslatedCar.transform = tr.matmul([tr.translate(0,0.3,0),tr.uniformScale(0.2)])
