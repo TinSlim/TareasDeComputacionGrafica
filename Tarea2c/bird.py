@@ -12,11 +12,42 @@ import Modulo.readobj as rbj
 import Modulo.lighting_shaders as ls
 #import lighting_shaders as ls
 
+class controller():
+    angulo=0
+    rotacion_alas=0
+    rotation_y=0
+    rotation_x=0
+
+control=controller()
 
 def on_key(window, key, scancode, action, mods):
     if action != glfw.PRESS:
         return
     
+    elif key == glfw.KEY_SPACE:
+        control.angulo+=0.1
+
+    elif key == glfw.KEY_Q:
+        control.angulo-=0.1
+
+    elif key == glfw.KEY_F:
+        control.rotacion_alas-=0.1
+
+    elif key == glfw.KEY_G:
+        control.rotacion_alas-=0.1
+
+    elif key == glfw.KEY_B:
+        control.rotation_x+=0.1
+
+    elif key == glfw.KEY_V:
+        control.rotation_x-=0.1
+
+    elif key == glfw.KEY_M:
+        control.rotation_y+=0.1
+
+    elif key == glfw.KEY_N:
+        control.rotation_y-=0.1
+
     elif key == glfw.KEY_ESCAPE:
         sys.exit()
 
@@ -46,13 +77,14 @@ def pajaro():
     #Ala sup derecha
     AlaSupDerecha = sg.SceneGraphNode("AlaSupDerecha")
     AlaSupDerecha.childs+=[gpuAlaSupDer]
-
+   
     #Ala derecha
     AlaDerecha = sg.SceneGraphNode("AlaDerecha")
     AlaDerecha.childs+=[AlaSupDerecha]
     AlaDerecha.childs+=[RotacionAlaInfDerecha]
+    AlaDerecha.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationY(np.pi),tr.rotationX(np.pi),tr.translate(1,2.5,0)])  #AlaDerecha.transform = tr.matmul([tr.translate(0,-2,0),tr.rotationX(np.pi*(2/3)),tr.translate(0,2,0.5)])#
 
-    #############
+    #############        tr.rotationX(np.pi)
     #Ala inf derecha
     AlaInfIzquierda = sg.SceneGraphNode("AlaInfIzquierda")
     AlaInfIzquierda.transform = tr.translate(0,0,0)  #Ajustar bn
@@ -68,10 +100,9 @@ def pajaro():
     AlaSupIzquierda.childs+=[gpuAlaSupIzq]
 
     #Ala derecha
-    AlaIzquierda = sg.SceneGraphNode("AlaDerecha")
+    AlaIzquierda = sg.SceneGraphNode("AlaIzquierda")
     AlaIzquierda.childs+=[AlaSupIzquierda]
     AlaIzquierda.childs+=[RotacionAlaInfIzquierda]
-######
     
     #Alas
     Alas = sg.SceneGraphNode("Alas")
@@ -148,6 +179,14 @@ if __name__ == "__main__":
     #gpuCarrot = es.toGPUShape(shape = readOBJ('carrot.obj', (0.6,0.9,0.5)))
 
     
+    Ala_Inf_Izquierda=sg.findNode(pajarito, "RotacionAlaInfIzquierda")
+    Ala_Inf_Derecha=sg.findNode(pajarito, "RotacionAlaInfDerecha")
+    
+    Ala_Derecha = sg.findNode(pajarito, "AlaDerecha")
+    Ala_Izquierda = sg.findNode(pajarito, "AlaIzquierda")
+    
+
+
     t0 = glfw.get_time()
     camera_theta = -3*np.pi/4
 
@@ -166,7 +205,20 @@ if __name__ == "__main__":
         if (glfw.get_key(window, glfw.KEY_RIGHT) == glfw.PRESS):
             camera_theta += 2* dt
 
-        # Setting up the view transform
+
+
+        ######################################
+        
+        Ala_Inf_Izquierda.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
+        Ala_Inf_Derecha.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
+
+        Ala_Derecha.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
+        Ala_Izquierda.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
+        #
+        print(control.angulo)#
+
+
+
         R = 12
         camX = R * np.sin(camera_theta)
         camY = R * np.cos(camera_theta)
