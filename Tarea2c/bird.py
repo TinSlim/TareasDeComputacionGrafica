@@ -28,11 +28,11 @@ def pajaro():
     gpuCabeza = es.toGPUShape(rbj.readOBJ("Model/cabeza.obj", (0,1,1)))
     gpuTorso = es.toGPUShape(rbj.readOBJ("Model/torso.obj", (0,1,1)))
     gpuAlaSupDer = es.toGPUShape(rbj.readOBJ("Model/alasupder.obj", (0,1,1)))
-    gpuAlaInfDer = es.toGPUShape(rbj.readOBJ("Model/cabeza.obj", (0,1,1)))
-    gpuAlaSupIzq = es.toGPUShape(bs.createColorCube(1,1,1))
-    gpuAlaInfIzq = es.toGPUShape(bs.createColorCube(1,1,1))
+    gpuAlaInfDer = es.toGPUShape(rbj.readOBJ("Model/alainfder.obj", (0,1,1)))
+    gpuAlaSupIzq = es.toGPUShape(rbj.readOBJ("Model/alasupizq.obj", (0,1,1)))
+    gpuAlaInfIzq = es.toGPUShape(rbj.readOBJ("Model/alainfizq.obj", (0,1,1)))
 
-
+    #################Ala Derecha
     #Ala inf derecha
     AlaInfDerecha = sg.SceneGraphNode("AlaInfDerecha")
     AlaInfDerecha.transform = tr.translate(0,0,0)  #Ajustar bn
@@ -40,7 +40,7 @@ def pajaro():
 
     #Rotación ala inf derecha
     RotacionAlaInfDerecha = sg.SceneGraphNode("RotacionAlaInfDerecha")
-    RotacionAlaInfDerecha.transform = tr.translate(0,0,0)  #Ajustar bn
+    RotacionAlaInfDerecha.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(np.pi/3),tr.translate(1,2,2)])
     RotacionAlaInfDerecha.childs+= [AlaInfDerecha]
 
     #Ala sup derecha
@@ -52,19 +52,43 @@ def pajaro():
     AlaDerecha.childs+=[AlaSupDerecha]
     AlaDerecha.childs+=[RotacionAlaInfDerecha]
 
+    #############
+    #Ala inf derecha
+    AlaInfIzquierda = sg.SceneGraphNode("AlaInfIzquierda")
+    AlaInfIzquierda.transform = tr.translate(0,0,0)  #Ajustar bn
+    AlaInfIzquierda.childs+=[gpuAlaInfIzq]
+
+    #Rotación ala inf derecha
+    RotacionAlaInfIzquierda = sg.SceneGraphNode("RotacionAlaInfIzquierda") 
+    RotacionAlaInfIzquierda.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-np.pi/3),tr.translate(-1,2,2)])
+    RotacionAlaInfIzquierda.childs+= [AlaInfIzquierda]
+
+    #Ala sup derecha
+    AlaSupIzquierda = sg.SceneGraphNode("AlaSupIzquierda")
+    AlaSupIzquierda.childs+=[gpuAlaSupIzq]
+
+    #Ala derecha
+    AlaIzquierda = sg.SceneGraphNode("AlaDerecha")
+    AlaIzquierda.childs+=[AlaSupIzquierda]
+    AlaIzquierda.childs+=[RotacionAlaInfIzquierda]
+######
+    
     #Alas
     Alas = sg.SceneGraphNode("Alas")
     Alas.childs+=[AlaDerecha]
-    #Alas.childs+=[AlaIzquierda]
+    Alas.childs+=[AlaIzquierda]
 
     #Torso
     Torso = sg.SceneGraphNode("Torso")
     Torso.childs+= [gpuTorso]
+    #Torso.transform=tr.matmul([tr.rotationX(np.pi/2),tr.uniformScale(1)])
+    #Torso.transform=tr.matmul([tr.rotationZ(90),tr.translate(0,0,0)])
 
     #Cabeza
     Cabeza = sg.SceneGraphNode("Cabeza")
     Cabeza.childs+= [gpuCabeza]
-    
+    #Cabeza.transform=tr.rotationX(np.pi/2)
+
     #Cuerpo
     Cuerpo = sg.SceneGraphNode("Cuerpo")
     Cuerpo.childs+= [Torso]
@@ -73,6 +97,8 @@ def pajaro():
     #Pajaro
     Pajaro = sg.SceneGraphNode("Pajaro")
     Pajaro.childs+=[Alas]
+    Pajaro.childs+=[Cuerpo]
+    Pajaro.transform=tr.rotationX(np.pi*(1/2))
 
     return Pajaro
 
