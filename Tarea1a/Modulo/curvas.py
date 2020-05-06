@@ -35,12 +35,12 @@ def separador_de_curvas(lista_puntos,lista_x):
         agujero=False
         for x in lista_x:
             if lista_puntos[n][0]==x[0] and lista_puntos[n][1]==x[1]:
-                ##
+
                 curva_actual.append( [lista_puntos[n][0]-0.1 , lista_puntos[n][1]] )####
-                ##
+
                 curva_actual.append(lista_puntos[n+1])
                 curvas.append(curva_actual)
-                curva_actual=[ [lista_puntos[n][0]-0.1,lista_puntos[n][1]] ,[ lista_puntos[n][0]+0.1,lista_puntos[n][1]] ]####2
+                curva_actual=[ [lista_puntos[n][0]-0.1,lista_puntos[n][1]] ,[ lista_puntos[n][0]+0.1,lista_puntos[n][1]] ]####
                 curvas.append(curva_actual)
                 curva_actual=[lista_puntos[n-1]]
                 curva_actual.append( [lista_puntos[n][0]+0.1, lista_puntos[n][1]] )###
@@ -84,11 +84,3 @@ def concatenacion(curvas_rectas):
         for coordenada in curva:
             curvas_final.append(coordenada)
     return curvas_final
-
-lista_x=[[5, 1]]
-lista=[[0, 4], [1, 2], [2, 6], [3, 3], [4, 7], [5, 1], [6, 1], [7, 1], [8, 1], [9, 3], [10, 4]]
-separadas=separador_de_curvas(lista,lista_x)
-#print(separadas)
-curvas_y_rectas=curvas_rectas(separadas)
-#print(concatenacion(curvas_y_rectas))
-# P1 = np.array([[0, 0, 1]]).T
