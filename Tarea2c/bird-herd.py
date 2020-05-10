@@ -209,11 +209,11 @@ if __name__ == "__main__":
     # Creating shapes on GPU memory
     gpuAxis = es.toGPUShape(bs.createAxis(7))
     #gpuSuzanne = es.toGPUShape(shape = readOBJ('suzanne.obj', (0.9,0.6,0.2)))
+    #gpuCarrot = es.toGPUShape(shape = readOBJ('carrot.obj', (0.6,0.9,0.5)))
 
     gpuSuzanne = es.toGPUShape(shape = rbj.readOBJ('Model/alasupder.obj', (0.9,0.6,0.2)))
     
-    pajarito2 = pajaro()
-    #gpuCarrot = es.toGPUShape(shape = readOBJ('carrot.obj', (0.6,0.9,0.5)))
+    ################################
     pajarito = pajaro()
 
     Ala_Inf_Izquierda=sg.findNode(pajarito, "RotacionAlaInfIzquierda")
@@ -223,7 +223,7 @@ if __name__ == "__main__":
     Ala_Izquierda = sg.findNode(pajarito, "AlaIzquierda")
     Pajaro1 = sg.findNode(pajarito, "Pajaro")
     Pajaro2 = sg.findNode(pajarito, "Pajaro1")
-
+    ##################################
     pajarito2 = pajaro()
     
     Ala_Inf_Izquierda2=sg.findNode(pajarito2, "RotacionAlaInfIzquierda")
@@ -233,7 +233,38 @@ if __name__ == "__main__":
     Ala_Izquierda2 = sg.findNode(pajarito2, "AlaIzquierda")
     Pajaro12 = sg.findNode(pajarito2, "Pajaro")
     Pajaro22 = sg.findNode(pajarito2, "Pajaro1")
+    ################################
+    pajarito3 = pajaro()
+
+    Ala_Inf_Izquierda3=sg.findNode(pajarito3, "RotacionAlaInfIzquierda")
+    Ala_Inf_Derecha3=sg.findNode(pajarito3, "RotacionAlaInfDerecha")
     
+    Ala_Derecha3 = sg.findNode(pajarito3, "AlaDerecha")
+    Ala_Izquierda3 = sg.findNode(pajarito3, "AlaIzquierda")
+    Pajaro13 = sg.findNode(pajarito3, "Pajaro")
+    Pajaro23 = sg.findNode(pajarito3, "Pajaro1")
+    ################################
+    pajarito4 = pajaro()
+
+    Ala_Inf_Izquierda4=sg.findNode(pajarito4, "RotacionAlaInfIzquierda")
+    Ala_Inf_Derecha4=sg.findNode(pajarito4, "RotacionAlaInfDerecha")
+    
+    Ala_Derecha4 = sg.findNode(pajarito4, "AlaDerecha")
+    Ala_Izquierda4 = sg.findNode(pajarito4, "AlaIzquierda")
+    Pajaro14 = sg.findNode(pajarito4, "Pajaro")
+    Pajaro24 = sg.findNode(pajarito4, "Pajaro1")
+    ################################
+    pajarito5 = pajaro()
+
+    Ala_Inf_Izquierda5=sg.findNode(pajarito5, "RotacionAlaInfIzquierda")
+    Ala_Inf_Derecha5=sg.findNode(pajarito5, "RotacionAlaInfDerecha")
+    
+    Ala_Derecha5 = sg.findNode(pajarito5, "AlaDerecha")
+    Ala_Izquierda5 = sg.findNode(pajarito5, "AlaIzquierda")
+    Pajaro15 = sg.findNode(pajarito5, "Pajaro")
+    Pajaro25 = sg.findNode(pajarito5, "Pajaro1")
+    ##################################
+
     #Config inicial
     Ala_Inf_Izquierda.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
     Ala_Inf_Derecha.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
@@ -241,19 +272,38 @@ if __name__ == "__main__":
     Ala_Derecha.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
     Ala_Izquierda.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
 
-#####
+    #####
     Ala_Inf_Izquierda2.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
     Ala_Inf_Derecha2.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
 
     Ala_Derecha2.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
     Ala_Izquierda2.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
-####
+    #####
+    Ala_Inf_Izquierda3.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
+    Ala_Inf_Derecha3.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
+
+    Ala_Derecha3.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
+    Ala_Izquierda3.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
+    #####
+    Ala_Inf_Izquierda4.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
+    Ala_Inf_Derecha4.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
+
+    Ala_Derecha4.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
+    Ala_Izquierda4.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
+    #####
+    Ala_Inf_Izquierda5.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
+    Ala_Inf_Derecha5.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
+
+    Ala_Derecha5.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
+    Ala_Izquierda5.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
+    ####
+
+
     rotacion_pajaro=0
 
     t0 = glfw.get_time()
     camera_theta = -3*np.pi/4
     
-    ###
     counter=0
 
     while not glfw.window_should_close(window):
@@ -310,8 +360,11 @@ if __name__ == "__main__":
         else:
             angulo_pajaro=np.arctan(control.derivada)+np.pi -np.pi/2
 
-        Pajaro1.transform = tr.translate(camaraX+1,camaraY+1,camaraZ)
-        Pajaro12.transform = tr.translate(camaraX,camaraY,camaraZ)
+        Pajaro1.transform = tr.translate(camaraX,camaraY,camaraZ)
+        Pajaro12.transform = tr.translate(camaraX+1,camaraY+1,camaraZ+1)
+        Pajaro13.transform = tr.translate(camaraX+2,camaraY+2,camaraZ+2)
+        Pajaro14.transform = tr.translate(camaraX+1,camaraY-1,camaraZ+1)
+        Pajaro15.transform = tr.translate(camaraX+2,camaraY-2,camaraZ+2)
         #Pajaro2.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(angulo_pajaro)])
        
         if angulo_pajaro>control.angulo_pajaro:
@@ -321,6 +374,9 @@ if __name__ == "__main__":
 
         Pajaro2.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(control.angulo_pajaro)])
         Pajaro22.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(control.angulo_pajaro)])
+        Pajaro23.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(control.angulo_pajaro)])
+        Pajaro24.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(control.angulo_pajaro)])
+        Pajaro25.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(control.angulo_pajaro)])
 
         #angulo = 0 apunta a negro verde    0.1.  verde
         #Angulo = pi/2  rojo
@@ -386,6 +442,9 @@ if __name__ == "__main__":
         ###
         sg.drawSceneGraphNode(pajarito, pipeline, "model")
         sg.drawSceneGraphNode(pajarito2, pipeline, "model")
+        sg.drawSceneGraphNode(pajarito3, pipeline, "model")
+        sg.drawSceneGraphNode(pajarito4, pipeline, "model")
+        sg.drawSceneGraphNode(pajarito5, pipeline, "model")
         #pipeline.drawShape(gpuSuzanne)
 
             ##
