@@ -17,13 +17,14 @@ import Modulo.csvtolist_nuevo as cv
 import Modulo.curvas as crv
 
 #######################glfw.set_input_mode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
-a=cv.parsear_archivo("path.csv")
+a=cv.parsear_archivo("patia.csv")
 lista=[]
 lista_pequenia=[]
 lista.append(a[len(a)-1])
 for punto in a:
     lista.append(punto)
 lista.append(a[0])
+lista.append(a[1])
 
 lista2=[]
 for punto in lista:
@@ -44,6 +45,7 @@ class controller():
     rotacion_alas=0
     rotation_y=0.1
     rotation_x=-1.6#0
+    derivada=0
 
     alasSubiendo=True
 
@@ -149,11 +151,16 @@ def pajaro():
     Cuerpo.childs+= [Torso]
     Cuerpo.childs+= [Cabeza]
 
+
+    #Pajaro Total1
+    Pajaro1 = sg.SceneGraphNode("Pajaro1")
+    Pajaro1.childs+=[Alas]
+    Pajaro1.childs+=[Cuerpo]
+    Pajaro1.transform=tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2))])
+
     #Pajaro
     Pajaro = sg.SceneGraphNode("Pajaro")
-    Pajaro.childs+=[Alas]
-    Pajaro.childs+=[Cuerpo]
-    Pajaro.transform=tr.rotationX(np.pi*(1/2))
+    Pajaro.childs+=[Pajaro1]
 
     return Pajaro
 
@@ -210,6 +217,7 @@ if __name__ == "__main__":
     Ala_Derecha = sg.findNode(pajarito, "AlaDerecha")
     Ala_Izquierda = sg.findNode(pajarito, "AlaIzquierda")
     Pajaro1 = sg.findNode(pajarito, "Pajaro")
+    Pajaro2 = sg.findNode(pajarito, "Pajaro1")
     
     #Config inicial
     Ala_Inf_Izquierda.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
@@ -218,6 +226,7 @@ if __name__ == "__main__":
     Ala_Derecha.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
     Ala_Izquierda.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
 
+    rotacion_pajaro=0
 
     t0 = glfw.get_time()
     camera_theta = -3*np.pi/4
@@ -256,9 +265,35 @@ if __name__ == "__main__":
         camaraX=c[counter][0]
         camaraY=c[counter][1]
         camaraZ=c[counter][2]
-        Pajaro1.transform=tr.translate(camaraX,camaraY,camaraZ)
-        #print(control.angulo,control.rotation_y)
-        #print(cursor_at)
+
+        posicion_siguienteX = c[counter+1][0]
+        posicion_siguienteY = c[counter+1][1]
+        posicion_siguienteZ = c[counter+1][2]
+        
+        if (posicion_siguienteX-camaraX)!=0:
+            derivada = (posicion_siguienteY-camaraY) / (posicion_siguienteX-camaraX)
+            if derivada>control.derivada:
+                control.derivada+=0.01
+            elif derivada<control.derivada:
+                control.derivada-=0.01
+
+        #angulo_pajaro=np.arctan(control.derivada)
+
+        if camaraX>posicion_siguienteX and camaraY<posicion_siguienteY:
+            angulo_pajaro=np.arctan(control.derivada) - np.pi/2#no cambiar
+        elif camaraX>posicion_siguienteX and camaraY > posicion_siguienteY:
+            angulo_pajaro=np.arctan(control.derivada) - np.pi/2#no cambiar
+        elif camaraX<posicion_siguienteX and camaraY > posicion_siguienteY:
+            angulo_pajaro=-np.arctan(control.derivada) +np.pi + np.pi/2 #arreglar
+        else:
+            angulo_pajaro=np.arctan(control.derivada)+np.pi -np.pi/2
+
+        Pajaro1.transform = tr.translate(camaraX,camaraY,camaraZ)
+        Pajaro2.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(angulo_pajaro)])
+        #angulo = 0 apunta a negro verde    0.1.  verde
+        #Angulo = pi/2  rojo
+        #print(camaraX,camaraY)
+        #print(angulo_pajaro)
 
         
         #-0.1   0.1
@@ -270,11 +305,11 @@ if __name__ == "__main__":
         camX = R * np.sin(camera_theta)
         camY = R * np.cos(camera_theta)
 
-        if counter==len(c)-4:
-            counter=0
+        #if counter==len(c)-4:      0.998995994995999 -1.000998997997999
+        #    counter=0
         counter+=1
 
-        #viewPos = np.array([camaraX, camaraY, camaraZ])
+        #viewPos = np.array([camaraX, camaraY, camaraZ])    
         viewPos = np.array([camX, camY, 7])
         view = tr.lookAt(
             viewPos,
