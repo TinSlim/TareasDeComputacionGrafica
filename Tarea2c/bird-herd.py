@@ -47,6 +47,9 @@ class controller():
     rotation_x=-1.6#0
     derivada=0
 
+
+    angulo_pajaro=0
+
     alasSubiendo=True
 
 control=controller()
@@ -206,11 +209,13 @@ if __name__ == "__main__":
     # Creating shapes on GPU memory
     gpuAxis = es.toGPUShape(bs.createAxis(7))
     #gpuSuzanne = es.toGPUShape(shape = readOBJ('suzanne.obj', (0.9,0.6,0.2)))
-    gpuSuzanne = es.toGPUShape(shape = rbj.readOBJ('Model/alasupder.obj', (0.9,0.6,0.2)))
-    pajarito=pajaro()
-    #gpuCarrot = es.toGPUShape(shape = readOBJ('carrot.obj', (0.6,0.9,0.5)))
 
+    gpuSuzanne = es.toGPUShape(shape = rbj.readOBJ('Model/alasupder.obj', (0.9,0.6,0.2)))
     
+    pajarito2 = pajaro()
+    #gpuCarrot = es.toGPUShape(shape = readOBJ('carrot.obj', (0.6,0.9,0.5)))
+    pajarito = pajaro()
+
     Ala_Inf_Izquierda=sg.findNode(pajarito, "RotacionAlaInfIzquierda")
     Ala_Inf_Derecha=sg.findNode(pajarito, "RotacionAlaInfDerecha")
     
@@ -218,6 +223,16 @@ if __name__ == "__main__":
     Ala_Izquierda = sg.findNode(pajarito, "AlaIzquierda")
     Pajaro1 = sg.findNode(pajarito, "Pajaro")
     Pajaro2 = sg.findNode(pajarito, "Pajaro1")
+
+    pajarito2 = pajaro()
+    
+    Ala_Inf_Izquierda2=sg.findNode(pajarito2, "RotacionAlaInfIzquierda")
+    Ala_Inf_Derecha2=sg.findNode(pajarito2, "RotacionAlaInfDerecha")
+    
+    Ala_Derecha2 = sg.findNode(pajarito2, "AlaDerecha")
+    Ala_Izquierda2 = sg.findNode(pajarito2, "AlaIzquierda")
+    Pajaro12 = sg.findNode(pajarito2, "Pajaro")
+    Pajaro22 = sg.findNode(pajarito2, "Pajaro1")
     
     #Config inicial
     Ala_Inf_Izquierda.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
@@ -226,6 +241,13 @@ if __name__ == "__main__":
     Ala_Derecha.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
     Ala_Izquierda.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
 
+#####
+    Ala_Inf_Izquierda2.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
+    Ala_Inf_Derecha2.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
+
+    Ala_Derecha2.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
+    Ala_Izquierda2.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
+####
     rotacion_pajaro=0
 
     t0 = glfw.get_time()
@@ -288,8 +310,18 @@ if __name__ == "__main__":
         else:
             angulo_pajaro=np.arctan(control.derivada)+np.pi -np.pi/2
 
-        Pajaro1.transform = tr.translate(camaraX,camaraY,camaraZ)
-        Pajaro2.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(angulo_pajaro)])
+        Pajaro1.transform = tr.translate(camaraX+1,camaraY+1,camaraZ)
+        Pajaro12.transform = tr.translate(camaraX,camaraY,camaraZ)
+        #Pajaro2.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(angulo_pajaro)])
+       
+        if angulo_pajaro>control.angulo_pajaro:
+            control.angulo_pajaro+=0.01
+        elif angulo_pajaro<control.angulo_pajaro:
+            control.angulo_pajaro-=0.01
+
+        Pajaro2.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(control.angulo_pajaro)])
+        Pajaro22.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(control.angulo_pajaro)])
+
         #angulo = 0 apunta a negro verde    0.1.  verde
         #Angulo = pi/2  rojo
         #print(camaraX,camaraY)
@@ -305,8 +337,8 @@ if __name__ == "__main__":
         camX = R * np.sin(camera_theta)
         camY = R * np.cos(camera_theta)
 
-        #if counter==len(c)-4:      0.998995994995999 -1.000998997997999
-        #    counter=0
+        if counter==len(c)-4:      #0.998995994995999 -1.000998997997999
+            counter=0
         counter+=1
 
         #viewPos = np.array([camaraX, camaraY, camaraZ])    
@@ -353,6 +385,7 @@ if __name__ == "__main__":
 
         ###
         sg.drawSceneGraphNode(pajarito, pipeline, "model")
+        sg.drawSceneGraphNode(pajarito2, pipeline, "model")
         #pipeline.drawShape(gpuSuzanne)
 
             ##
