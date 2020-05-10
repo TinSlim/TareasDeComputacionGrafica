@@ -85,10 +85,18 @@ def concatenacion(curvas_rectas):
             curvas_final.append(coordenada)
     return curvas_final
 
-lista_x=[[5, 1]]
-lista=[[0, 4], [1, 2], [2, 6], [3, 3], [4, 7], [5, 1], [6, 1], [7, 1], [8, 1], [9, 3], [10, 4]]
-separadas=separador_de_curvas(lista,lista_x)
-#print(separadas)
-curvas_y_rectas=curvas_rectas(separadas)
-#print(concatenacion(curvas_y_rectas))
-# P1 = np.array([[0, 0, 1]]).T
+
+
+def curvas_pajaros(lista):
+    Mh = np.array([[0, -0.5, 1, -0.5], [1, 0, -2.5, 1.5], [0, 0.5, 2, -1.5], [0, 0, -0.5, 0.5]])
+
+    curvas_puntos=[]
+    n=0
+    m=0
+    G=0
+    n=0
+    while n<len(lista)-3:
+        G = Catmull( np.array([[ lista[n][0],lista[n][1],lista[n][2]]]).T,np.array([[lista[n+1][0],lista[n+1][1],lista[n+1][2]]]).T,np.array([[lista[n+2][0],lista[n+2][1],lista[n+2][2]]]).T,np.array([[lista[n+3][0],lista[n+3][1],lista[n+3][2]]]).T)
+        curvas_puntos.append(evalCurve(G,500))####10 implica velocidad
+        n+=1
+    return curvas_puntos
