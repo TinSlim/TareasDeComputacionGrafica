@@ -42,11 +42,15 @@ c=crv.concatenacion(b)
 
 class controller():
     angulo=-0.1
-    rotacion_alas=0
     rotation_y=0.1
+
+
+    rotacion_alas=0
     rotation_x=-1.6#0
     derivada=0
 
+    alas_subiendo = True
+    alas_bajando = False
 
     angulo_pajaro=0
 
@@ -91,6 +95,10 @@ def pajaro():
     gpuAlaInfDer = es.toGPUShape(rbj.readOBJ("Model/alainfder.obj", (0,1,1)))
     gpuAlaSupIzq = es.toGPUShape(rbj.readOBJ("Model/alasupizq.obj", (0,1,1)))
     gpuAlaInfIzq = es.toGPUShape(rbj.readOBJ("Model/alainfizq.obj", (0,1,1)))
+    a=bs.createColorQuad(0, 0, 0)
+    gpuBlackQuad =  es.toGPUShape(a)
+
+    
 
     #################Ala Derecha
     #Ala inf derecha
@@ -177,7 +185,7 @@ if __name__ == "__main__":
 
     width = 600
     height = 600
-
+    
     window = glfw.create_window(width, height, "Reading a *.obj file", None, None)
 
     if not window:
@@ -213,7 +221,10 @@ if __name__ == "__main__":
 
     gpuSuzanne = es.toGPUShape(shape = rbj.readOBJ('Model/alasupder.obj', (0.9,0.6,0.2)))
     
-    ################################
+
+    #####################################################
+    ##Se crean 5 pájaros y se guardan los nodos que se usarán despues##
+    #####################################################
     pajarito = pajaro()
 
     Ala_Inf_Izquierda=sg.findNode(pajarito, "RotacionAlaInfIzquierda")
@@ -223,7 +234,7 @@ if __name__ == "__main__":
     Ala_Izquierda = sg.findNode(pajarito, "AlaIzquierda")
     Pajaro1 = sg.findNode(pajarito, "Pajaro")
     Pajaro2 = sg.findNode(pajarito, "Pajaro1")
-    ##################################
+    ###############
     pajarito2 = pajaro()
     
     Ala_Inf_Izquierda2=sg.findNode(pajarito2, "RotacionAlaInfIzquierda")
@@ -233,7 +244,7 @@ if __name__ == "__main__":
     Ala_Izquierda2 = sg.findNode(pajarito2, "AlaIzquierda")
     Pajaro12 = sg.findNode(pajarito2, "Pajaro")
     Pajaro22 = sg.findNode(pajarito2, "Pajaro1")
-    ################################
+    ###############
     pajarito3 = pajaro()
 
     Ala_Inf_Izquierda3=sg.findNode(pajarito3, "RotacionAlaInfIzquierda")
@@ -243,7 +254,7 @@ if __name__ == "__main__":
     Ala_Izquierda3 = sg.findNode(pajarito3, "AlaIzquierda")
     Pajaro13 = sg.findNode(pajarito3, "Pajaro")
     Pajaro23 = sg.findNode(pajarito3, "Pajaro1")
-    ################################
+    ###############
     pajarito4 = pajaro()
 
     Ala_Inf_Izquierda4=sg.findNode(pajarito4, "RotacionAlaInfIzquierda")
@@ -253,7 +264,7 @@ if __name__ == "__main__":
     Ala_Izquierda4 = sg.findNode(pajarito4, "AlaIzquierda")
     Pajaro14 = sg.findNode(pajarito4, "Pajaro")
     Pajaro24 = sg.findNode(pajarito4, "Pajaro1")
-    ################################
+    ###############
     pajarito5 = pajaro()
 
     Ala_Inf_Izquierda5=sg.findNode(pajarito5, "RotacionAlaInfIzquierda")
@@ -263,40 +274,41 @@ if __name__ == "__main__":
     Ala_Izquierda5 = sg.findNode(pajarito5, "AlaIzquierda")
     Pajaro15 = sg.findNode(pajarito5, "Pajaro")
     Pajaro25 = sg.findNode(pajarito5, "Pajaro1")
-    ##################################
+    ###############
 
-    #Config inicial
+    ##############################################
+    ##Configuración incial nodos anteriores para los 5 pájaros##
+    ##############################################
     Ala_Inf_Izquierda.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
     Ala_Inf_Derecha.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
 
     Ala_Derecha.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
     Ala_Izquierda.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
-
-    #####
+    ##########
     Ala_Inf_Izquierda2.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
     Ala_Inf_Derecha2.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
 
     Ala_Derecha2.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
     Ala_Izquierda2.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
-    #####
+    ##########
     Ala_Inf_Izquierda3.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
     Ala_Inf_Derecha3.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
 
     Ala_Derecha3.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
     Ala_Izquierda3.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
-    #####
+    ##########
     Ala_Inf_Izquierda4.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
     Ala_Inf_Derecha4.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
 
     Ala_Derecha4.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
     Ala_Izquierda4.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
-    #####
+    ##########
     Ala_Inf_Izquierda5.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
     Ala_Inf_Derecha5.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
 
     Ala_Derecha5.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
     Ala_Izquierda5.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
-    ####
+    #########
 
 
     rotacion_pajaro=0
@@ -325,14 +337,59 @@ if __name__ == "__main__":
 
 
 
-        ######################################
-        if cursor_at[1]<600 and cursor_at[1]>0:
-            Ala_Inf_Izquierda.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo+0.00215*cursor_at[1])),tr.translate(-1.5,2,2)])
-            Ala_Inf_Derecha.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo+0.00215*cursor_at[1]),tr.translate(1.5,2,2)])
 
-            Ala_Derecha.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y-0.0045*cursor_at[1]),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
-            Ala_Izquierda.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y-0.0045*cursor_at[1])),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
-        
+        ############################
+        ##Movimiento de Alas automático##
+        ############################
+        if control.alas_subiendo:
+            if control.angulo>1.2 or control.rotation_y<-2.6:
+                control.alas_subiendo = not control.alas_subiendo
+                control.alas_bajando = not control.alas_bajando
+            else:
+                control.angulo+=0.02
+                control.rotation_y-=0.04
+        elif control.alas_bajando:
+            if control.angulo<-0.1 or control.rotation_y>0.1:
+                control.alas_subiendo = not control.alas_subiendo
+                control.alas_bajando = not control.alas_bajando
+            else:
+                control.angulo-=0.02
+                control.rotation_y+=0.04
+
+        ##############################
+        ##Actualización Alas para cada pajaro##
+        ##############################
+        Ala_Inf_Izquierda.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
+        Ala_Inf_Derecha.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
+
+        Ala_Derecha.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
+        Ala_Izquierda.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
+        ###############
+        Ala_Inf_Izquierda2.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
+        Ala_Inf_Derecha2.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
+
+        Ala_Derecha2.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
+        Ala_Izquierda2.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
+        ###############
+        Ala_Inf_Izquierda3.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
+        Ala_Inf_Derecha3.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
+
+        Ala_Derecha3.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
+        Ala_Izquierda3.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
+        ###############
+        Ala_Inf_Izquierda4.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
+        Ala_Inf_Derecha4.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
+
+        Ala_Derecha4.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
+        Ala_Izquierda4.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
+        ################
+        Ala_Inf_Izquierda5.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
+        Ala_Inf_Derecha5.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
+
+        Ala_Derecha5.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
+        Ala_Izquierda5.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
+   
+
 
         camaraX=c[counter][0]
         camaraY=c[counter][1]
@@ -367,11 +424,15 @@ if __name__ == "__main__":
         Pajaro15.transform = tr.translate(camaraX+2,camaraY-2,camaraZ+2)
         #Pajaro2.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(angulo_pajaro)])
        
+
+
+        #Rotacion respecto a su eje
         if angulo_pajaro>control.angulo_pajaro:
             control.angulo_pajaro+=0.01
         elif angulo_pajaro<control.angulo_pajaro:
             control.angulo_pajaro-=0.01
 
+        #Aplicar Rotaciones
         Pajaro2.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(control.angulo_pajaro)])
         Pajaro22.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(control.angulo_pajaro)])
         Pajaro23.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(control.angulo_pajaro)])
