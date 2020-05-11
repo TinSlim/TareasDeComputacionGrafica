@@ -13,10 +13,11 @@ import Modulo.lighting_shaders as ls
 #import lighting_shaders as ls
 
 class controller():
-    angulo=0
+    angulo=-0.1
     rotacion_alas=0
-    rotation_y=0
-    rotation_x=0
+    rotation_y=0.1
+    rotation_x=-1.6#0
+    f=0
 
 control=controller()
 
@@ -125,12 +126,15 @@ def pajaro():
     Cuerpo.childs+= [Torso]
     Cuerpo.childs+= [Cabeza]
 
+    #Pajaro Total1
+    Pajaro1 = sg.SceneGraphNode("Pajaro1")
+    Pajaro1.childs+=[Alas]
+    Pajaro1.childs+=[Cuerpo]
+    Pajaro1.transform=tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2))])
+
     #Pajaro
     Pajaro = sg.SceneGraphNode("Pajaro")
-    Pajaro.childs+=[Alas]
-    Pajaro.childs+=[Cuerpo]
-    Pajaro.transform=tr.rotationX(np.pi*(1/2))
-
+    Pajaro.childs+=[Pajaro1]
     return Pajaro
 
 
@@ -184,7 +188,15 @@ if __name__ == "__main__":
     
     Ala_Derecha = sg.findNode(pajarito, "AlaDerecha")
     Ala_Izquierda = sg.findNode(pajarito, "AlaIzquierda")
+    Pajaro2 = sg.findNode(pajarito, "Pajaro1")
     
+    #Config inicial
+    Ala_Inf_Izquierda.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
+    Ala_Inf_Derecha.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
+
+    Ala_Derecha.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
+    Ala_Izquierda.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
+
 
 
     t0 = glfw.get_time()
@@ -193,6 +205,7 @@ if __name__ == "__main__":
     while not glfw.window_should_close(window):
         # Using GLFW to check for input events
         glfw.poll_events()
+        cursor_at = glfw.get_cursor_pos(window)
 
         # Getting the time difference from the previous iteration
         t1 = glfw.get_time()
@@ -209,15 +222,18 @@ if __name__ == "__main__":
 
         ######################################
         
-        Ala_Inf_Izquierda.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
-        Ala_Inf_Derecha.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
+        
+        if cursor_at[1]<600 and cursor_at[1]>0:
+            Ala_Inf_Izquierda.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo+0.00215*cursor_at[1])),tr.translate(-1.5,2,2)])
+            Ala_Inf_Derecha.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo+0.00215*cursor_at[1]),tr.translate(1.5,2,2)])
 
-        Ala_Derecha.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
-        Ala_Izquierda.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
+            Ala_Derecha.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y-0.0045*cursor_at[1]),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
+            Ala_Izquierda.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y-0.0045*cursor_at[1])),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
         #
-        print(control.angulo)#
 
 
+        Pajaro2.transform = tr.matmul([tr.rotationX(np.pi*(1/2)),tr.rotationY(control.f+np.pi/2)])
+        
 
         R = 12
         camX = R * np.sin(camera_theta)
