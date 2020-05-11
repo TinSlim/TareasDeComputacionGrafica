@@ -16,7 +16,7 @@ import Modulo.lighting_shaders as ls
 import Modulo.csvtolist_nuevo as cv
 import Modulo.curvas as crv
 
-#######################glfw.set_input_mode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
+#######################
 a=cv.parsear_archivo("patia.csv")
 lista=[]
 lista_pequenia=[]
@@ -187,6 +187,7 @@ if __name__ == "__main__":
     height = 600
     
     window = glfw.create_window(width, height, "Reading a *.obj file", None, None)
+    glfw.set_input_mode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
 
     if not window:
         glfw.terminate()
@@ -315,27 +316,60 @@ if __name__ == "__main__":
 
     t0 = glfw.get_time()
     camera_theta = -3*np.pi/4
+    camera_theta2 = 0
     
     counter=0
 
+    cursor_at = glfw.get_cursor_pos(window)
+    cursor_actual=cursor_at
     while not glfw.window_should_close(window):
         # Using GLFW to check for input events
         
         glfw.poll_events()
         cursor_at = glfw.get_cursor_pos(window)
+        
 
         # Getting the time difference from the previous iteration
         t1 = glfw.get_time()
         dt = t1 - t0
         t0 = t1
 
+        if cursor_actual[0]<cursor_at[0]:           #-->
+            if cursor_actual[1]<cursor_at[1]:           #ABAJO
+                camera_theta2 -= 2*(cursor_at[1]-cursor_actual[1])/500#* dt  
+                camera_theta += 2* (cursor_at[0]-cursor_actual[0])/500
+            if cursor_actual[1]>cursor_at[1]:
+                camera_theta2 += 2* (cursor_actual[1]-cursor_at[1])/500
+                camera_theta += 2* (cursor_at[0]-cursor_actual[0])/500
+            cursor_actual = cursor_at
+            print('a')
+        
+        if cursor_actual[0]>cursor_at[0]:               #
+            if cursor_actual[1]<cursor_at[1]:
+                camera_theta2 -= 2* (cursor_at[1]-cursor_actual[1])/500
+                camera_theta -= 2* (cursor_actual[0]-cursor_at[0])/500
+            if cursor_actual[1]>cursor_at[1]:
+                camera_theta2 += 2* (cursor_actual[1]-cursor_at[1])/500
+                camera_theta -= 2* (cursor_actual[0]-cursor_at[0])/500
+            cursor_actual = cursor_at
+            print('b')
+
+        #print(cursor_at,cursor_actual)
+        print(cursor_actual,cursor_at)
+
         if (glfw.get_key(window, glfw.KEY_LEFT) == glfw.PRESS):
             camera_theta -= 2 * dt
 
         if (glfw.get_key(window, glfw.KEY_RIGHT) == glfw.PRESS):
             camera_theta += 2* dt
+        
+        if (glfw.get_key(window, glfw.KEY_UP) == glfw.PRESS):
+            camera_theta2 += 2* dt
+        
+        if (glfw.get_key(window, glfw.KEY_DOWN) == glfw.PRESS):
+            camera_theta2 -= 2* dt
 
-
+        
 
 
         ############################
@@ -451,20 +485,23 @@ if __name__ == "__main__":
         # 1.3     2.7
         #0.00216         0.004500
         R = 12
-        camX = R * np.sin(camera_theta)
-        camY = R * np.cos(camera_theta)
+        camX = R * np.sin(camera_theta) * np.sin(camera_theta2)
+        camY = R * np.cos(camera_theta) * np.sin(camera_theta2)
+        camZ = R * np.cos(camera_theta2)
 
         if counter==len(c)-4:      #0.998995994995999 -1.000998997997999
             counter=0
         counter+=1
 
-        #viewPos = np.array([camaraX, camaraY, camaraZ])    
+        viewPos2 = np.array([0, 0, 0])    
         viewPos = np.array([camX, camY, 7])
         view = tr.lookAt(
+            viewPos2,
+            #np.array([0,0,1]),
             viewPos,
-            np.array([0,0,1]),
             np.array([0,0,1])
         )
+        #Dnd esta, hacia a donde ,para arriba
 
         # Setting up the projection transform
         projection = tr.perspective(60, float(width)/float(height), 0.1, 100)
