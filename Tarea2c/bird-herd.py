@@ -175,6 +175,75 @@ def pajaro():
 
     return Pajaro
 
+def createTextureCube(image_filename):
+
+    # Defining locations and texture coordinates for each vertex of the shape  
+    vertices = [
+    #   positions         texture coordinates
+    # Z+
+        -5, -5,  5, 0, 0.3,     #x,y-->| abajo
+         5, -5,  5, 0.5, 0.3,
+         5,  5,  5, 0.5, 0,
+        -5,  5,  5, 0, 0,
+
+    # Z-
+        -5, -5, -5, 0.5, 0.3,
+         5, -5, -5, 1, 0.3,
+         5,  5, -5, 1, 0,
+        -5,  5, -5, 0.5, 0,
+        
+    # X+
+         5, -5, -5, 0, 0.6,
+         5,  5, -5, 0.5, 0.6,
+         5,  5,  5, 0.5, 0.3,
+         5, -5,  5, 0, 0.3
+,
+ 
+    # X-
+        -5, -5, -5, 0.5, 0.6,
+        -5,  5, -5, 1, 0.6,
+        -5,  5,  5, 1, 0.3,
+        -5, -5,  5, 0.5, 0.3,
+
+    # Y+
+        -5,  5, -5, 0, 0.9,
+         5,  5, -5, 0.5, 0.9,
+         5,  5,  5, 0.5, 0.6,
+        -5,  5,  5, 0, 0.6,
+
+    # Y-
+        -5, -5, -5, 0.5, 0.9,
+         5, -5, -5, 1, 0.9,
+         5, -5,  5, 1, 0.6,
+        -5, -5,  5, 0.5, 0.6
+        ]
+
+    # Defining connections among vertices
+    # We have a triangle every 3 indices specified
+    indices = [
+          0, 1, 2, 2, 3, 0, # Z+
+          7, 6, 5, 5, 4, 7, # Z-
+          8, 9,10,10,11, 8, # X+
+         15,14,13,13,12,15, # X-
+         19,18,17,17,16,19, # Y+
+         20,21,22,22,23,20] # Y-
+
+    return bs.Shape(vertices, indices, image_filename)
+
+
+def createWall():
+    Gpu1 = es.toGPUShape(createTextureCube("base.png"),GL_REPEAT,GL_LINEAR)
+
+    Fondo1 = sg.SceneGraphNode("Fondo1")
+    Fondo1.childs += [Gpu1]
+    Fondo1.transform = tr.uniformScale(22)
+
+    Fondos = sg.SceneGraphNode("Fondos")
+    Fondos.childs+=[Fondo1]
+    
+
+    return Fondos
+
 
 
 if __name__ == "__main__":
@@ -204,6 +273,7 @@ if __name__ == "__main__":
     pipeline = ls.SimplePhongShaderProgram()
     #pipeline = ls.SimplePhongShaderProgram()
     mvpPipeline = es.SimpleModelViewProjectionShaderProgram()
+    mvpTPipeline = es.SimpleTextureModelViewProjectionShaderProgram()
 
     # Telling OpenGL to use our shader program
     glUseProgram(pipeline.shaderProgram)
@@ -222,6 +292,8 @@ if __name__ == "__main__":
 
     gpuSuzanne = es.toGPUShape(shape = rbj.readOBJ('Model/alasupder.obj', (0.9,0.6,0.2)))
     
+
+    Fondo = createWall()
 
     #####################################################
     ##Se crean 5 pájaros y se guardan los nodos que se usarán despues##
@@ -336,15 +408,15 @@ if __name__ == "__main__":
 
         if cursor_actual[0]<cursor_at[0]:           #-->
             if cursor_actual[1]<cursor_at[1]:           #ABAJO
-                camera_theta2 -= 2*(cursor_at[1]-cursor_actual[1])/500#* dt  
+                camera_theta2 -= 2*(cursor_at[1]-cursor_actual[1])/500#* dt
                 camera_theta += 2* (cursor_at[0]-cursor_actual[0])/500
             if cursor_actual[1]>cursor_at[1]:
                 camera_theta2 += 2* (cursor_actual[1]-cursor_at[1])/500
                 camera_theta += 2* (cursor_at[0]-cursor_actual[0])/500
             cursor_actual = cursor_at
-            print('a')
+
         
-        if cursor_actual[0]>cursor_at[0]:               #
+        if cursor_actual[0]>cursor_at[0]:               
             if cursor_actual[1]<cursor_at[1]:
                 camera_theta2 -= 2* (cursor_at[1]-cursor_actual[1])/500
                 camera_theta -= 2* (cursor_actual[0]-cursor_at[0])/500
@@ -352,10 +424,10 @@ if __name__ == "__main__":
                 camera_theta2 += 2* (cursor_actual[1]-cursor_at[1])/500
                 camera_theta -= 2* (cursor_actual[0]-cursor_at[0])/500
             cursor_actual = cursor_at
-            print('b')
+
 
         #print(cursor_at,cursor_actual)
-        print(cursor_actual,cursor_at)
+
 
         if (glfw.get_key(window, glfw.KEY_LEFT) == glfw.PRESS):
             camera_theta -= 2 * dt
@@ -494,17 +566,19 @@ if __name__ == "__main__":
         counter+=1
 
         viewPos2 = np.array([0, 0, 0])    
-        viewPos = np.array([camX, camY, 7])
+        viewPos = np.array([camX, camY, camZ])
+
+
         view = tr.lookAt(
             viewPos2,
             #np.array([0,0,1]),
             viewPos,
-            np.array([0,0,1])
+            np.array([ 0,0,1])
         )
         #Dnd esta, hacia a donde ,para arriba
 
         # Setting up the projection transform
-        projection = tr.perspective(60, float(width)/float(height), 0.1, 100)
+        projection = tr.perspective(60, float(width)/float(height), 0.001, 500)
 
         # Clearing the screen in both, color and depth
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -515,6 +589,13 @@ if __name__ == "__main__":
         #else:
         #    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
+        glUseProgram(mvpTPipeline.shaderProgram)
+        glUniformMatrix4fv(glGetUniformLocation(mvpTPipeline.shaderProgram, "projection"), 1, GL_TRUE, projection)
+        glUniformMatrix4fv(glGetUniformLocation(mvpTPipeline.shaderProgram, "view"), 1, GL_TRUE, view)
+        glUniformMatrix4fv(glGetUniformLocation(mvpTPipeline.shaderProgram, "model"), 1, GL_TRUE, tr.identity())
+        sg.drawSceneGraphNode(Fondo, mvpTPipeline, "model")
+        
+        
         # Drawing shapes
         glUseProgram(pipeline.shaderProgram)
         glUniform3f(glGetUniformLocation(pipeline.shaderProgram, "La"), 1.0, 1.0, 1.0)
@@ -543,6 +624,8 @@ if __name__ == "__main__":
         sg.drawSceneGraphNode(pajarito3, pipeline, "model")
         sg.drawSceneGraphNode(pajarito4, pipeline, "model")
         sg.drawSceneGraphNode(pajarito5, pipeline, "model")
+
+        #sg.drawSceneGraphNode(Fondo, pipeline, "model")
         #pipeline.drawShape(gpuSuzanne)
 
             ##
@@ -559,6 +642,7 @@ if __name__ == "__main__":
         glUniformMatrix4fv(glGetUniformLocation(mvpPipeline.shaderProgram, "view"), 1, GL_TRUE, view)
         glUniformMatrix4fv(glGetUniformLocation(mvpPipeline.shaderProgram, "model"), 1, GL_TRUE, tr.identity())
         mvpPipeline.drawShape(gpuAxis, GL_LINES)
+
 
         # Once the drawing is rendered, buffers are swap so an uncomplete drawing is never seen.
         glfw.swap_buffers(window)
