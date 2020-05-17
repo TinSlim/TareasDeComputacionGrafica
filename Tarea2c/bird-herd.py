@@ -17,7 +17,7 @@ import Modulo.csvtolist_nuevo as cv
 import Modulo.curvas as crv
 
 #######################
-a=cv.parsear_archivo("patia.csv")
+a=cv.parsear_archivo("path2.csv")
 lista=[]
 lista_pequenia=[]
 lista.append(a[len(a)-1])
@@ -32,13 +32,12 @@ for punto in lista:
         lista_pequenia.append(int(coordenada))
     lista2.append(lista_pequenia)
     lista_pequenia=[]
-print(lista2)
 
 b=crv.curvas_pajaros(lista2)
 
 c=crv.concatenacion(b)
 
-#print(c)
+
 
 class controller():
     angulo=-0.1
@@ -84,17 +83,48 @@ def on_key(window, key, scancode, action, mods):
     elif key == glfw.KEY_ESCAPE:
         sys.exit()
 
+def fondo():
+    GpuSuelo = es.toGPUShape(bs.createTextureQuad("campo.jpg"),GL_REPEAT,GL_LINEAR)
+    GpuPared = es.toGPUShape(bs.createTextureQuad("Fondo2.png"),GL_REPEAT,GL_LINEAR)
 
 
+    suelo = sg.SceneGraphNode("Suelo")
+    suelo.childs+=[GpuSuelo]
+    suelo.transform = tr.matmul([tr.uniformScale(55),tr.translate(0,0,-1)])
+
+    pared1 = sg.SceneGraphNode("pared1")
+    pared1.childs+=[GpuPared]
+    pared1.transform = tr.matmul([tr.translate(0,55,15),tr.scale(125,1,45),tr.rotationX(np.pi/2)])
+
+    pared2 = sg.SceneGraphNode("pared2")
+    pared2.childs+=[GpuPared]
+    pared2.transform = tr.matmul([tr.translate(0,-55,15),tr.scale(125,1,45),tr.rotationX(np.pi/2)])
+
+    pared3 = sg.SceneGraphNode("pared3")
+    pared3.childs+=[GpuPared]
+    pared3.transform = tr.matmul([tr.translate(50,0,15),tr.scale(1,125,45),tr.rotationX(np.pi/2),tr.rotationY(np.pi/2)])
+
+    pared4 = sg.SceneGraphNode("pared4")
+    pared4.childs+=[GpuPared]
+    pared4.transform = tr.matmul([tr.translate(-55,0,15),tr.scale(1,125,45),tr.rotationX(np.pi/2),tr.rotationY(np.pi/2)])
+
+    Fondo = sg.SceneGraphNode("Fondo")
+    Fondo.childs+= [suelo]
+    Fondo.childs+= [pared1]
+    Fondo.childs+= [pared2] 
+    Fondo.childs+= [pared3]
+    Fondo.childs+= [pared4]
+
+    return Fondo
 
 
 def pajaro():
-    gpuCabeza = es.toGPUShape(rbj.readOBJ("Model/cabeza.obj", (0,1,1)))
-    gpuTorso = es.toGPUShape(rbj.readOBJ("Model/torso.obj", (0,1,1)))
-    gpuAlaSupDer = es.toGPUShape(rbj.readOBJ("Model/alasupder.obj", (0,1,1)))
-    gpuAlaInfDer = es.toGPUShape(rbj.readOBJ("Model/alainfder.obj", (0,1,1)))
-    gpuAlaSupIzq = es.toGPUShape(rbj.readOBJ("Model/alasupizq.obj", (0,1,1)))
-    gpuAlaInfIzq = es.toGPUShape(rbj.readOBJ("Model/alainfizq.obj", (0,1,1)))
+    gpuCabeza = es.toGPUShape(rbj.readOBJ("Model/cabeza.obj", (0,0.5,0.8)))
+    gpuTorso = es.toGPUShape(rbj.readOBJ("Model/torso.obj", (1,1,0.3)))
+    gpuAlaSupDer = es.toGPUShape(rbj.readOBJ("Model/alasupder.obj", (0,0.5,0.9)))
+    gpuAlaInfDer = es.toGPUShape(rbj.readOBJ("Model/alainfder.obj", (0,0.5,1)))
+    gpuAlaSupIzq = es.toGPUShape(rbj.readOBJ("Model/alasupizq.obj", (0,0.5,0.9)))
+    gpuAlaInfIzq = es.toGPUShape(rbj.readOBJ("Model/alainfizq.obj", (0,0.5,1)))
     a=bs.createColorQuad(0, 0, 0)
     gpuBlackQuad =  es.toGPUShape(a)
 
@@ -119,15 +149,15 @@ def pajaro():
     AlaDerecha = sg.SceneGraphNode("AlaDerecha")
     AlaDerecha.childs+=[AlaSupDerecha]
     AlaDerecha.childs+=[RotacionAlaInfDerecha]
-    AlaDerecha.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationY(np.pi),tr.rotationX(np.pi),tr.translate(1,2.5,0)])  #AlaDerecha.transform = tr.matmul([tr.translate(0,-2,0),tr.rotationX(np.pi*(2/3)),tr.translate(0,2,0.5)])#
+    #AlaDerecha.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationY(np.pi),tr.rotationX(np.pi),tr.translate(1,2.5,0)])  #AlaDerecha.transform = tr.matmul([tr.translate(0,-2,0),tr.rotationX(np.pi*(2/3)),tr.translate(0,2,0.5)])#
 
     #############        tr.rotationX(np.pi)
     #Ala inf derecha
     AlaInfIzquierda = sg.SceneGraphNode("AlaInfIzquierda")
-    AlaInfIzquierda.transform = tr.translate(0,0,0)  #Ajustar bn
+    #AlaInfIzquierda.transform = tr.translate(0,0,0)  #Ajustar bn
     AlaInfIzquierda.childs+=[gpuAlaInfIzq]
 
-    #Rotación ala inf derecha
+    #Rotación ala inf izquierda
     RotacionAlaInfIzquierda = sg.SceneGraphNode("RotacionAlaInfIzquierda") 
     RotacionAlaInfIzquierda.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-np.pi/3),tr.translate(-1,2,2)])
     RotacionAlaInfIzquierda.childs+= [AlaInfIzquierda]
@@ -232,7 +262,17 @@ def createTextureCube(image_filename):
 
 
 def createWall():
-    Gpu1 = es.toGPUShape(createTextureCube("base.png"),GL_REPEAT,GL_LINEAR)
+    Gpu1 = es.toGPUShape(createTextureCube("espacio.png"),GL_REPEAT,GL_LINEAR)
+    Gpu2 = es.toGPUShape(bs.createTextureQuad("sol.jpg"),GL_REPEAT,GL_LINEAR)
+    Gpu3 = es.toGPUShape(bs.createTextureQuad("satelite.jpg"),GL_REPEAT,GL_LINEAR)
+
+    Satelite = sg.SceneGraphNode("Satelite")
+    Satelite.childs += [Gpu3]
+    Satelite.transform = tr.matmul([tr.rotationZ(1),tr.rotationY(np.pi/2),])
+
+    Sol = sg.SceneGraphNode("Sol")
+    Sol.childs += [Gpu2]
+    Sol.transform = tr.matmul([tr.translate(-3, 0, 3),tr.rotationZ(1),tr.rotationY(np.pi/2),])
 
     Fondo1 = sg.SceneGraphNode("Fondo1")
     Fondo1.childs += [Gpu1]
@@ -240,6 +280,8 @@ def createWall():
 
     Fondos = sg.SceneGraphNode("Fondos")
     Fondos.childs+=[Fondo1]
+    Fondos.childs+=[Sol]
+    Fondos.childs+=[Satelite]
     
 
     return Fondos
@@ -279,7 +321,8 @@ if __name__ == "__main__":
     glUseProgram(pipeline.shaderProgram)
 
     # Setting up the clear screen color
-    glClearColor(0.85, 0.85, 0.85, 1.0)
+    #glClearColor(0.85, 0.85, 0.85, 1.0)
+    glClearColor(19/255, 175/255, 1, 1.0)
 
     # As we work in 3D, we need to check which part is in front,
     # and which one is at the back
@@ -294,7 +337,7 @@ if __name__ == "__main__":
     
 
     Fondo = createWall()
-
+    #Fondo = fondo()
     #####################################################
     ##Se crean 5 pájaros y se guardan los nodos que se usarán despues##
     #####################################################
@@ -394,9 +437,12 @@ if __name__ == "__main__":
 
     cursor_at = glfw.get_cursor_pos(window)
     cursor_actual=cursor_at
+    cursor_limite = [cursor_actual[0],cursor_actual[1]]
     while not glfw.window_should_close(window):
         # Using GLFW to check for input events
         
+
+
         glfw.poll_events()
         cursor_at = glfw.get_cursor_pos(window)
         
@@ -406,27 +452,39 @@ if __name__ == "__main__":
         dt = t1 - t0
         t0 = t1
 
+        
+
+
+        cursor_limite[0] += (cursor_at[0]-cursor_actual[0])
+        cursor_limite[1] += (cursor_at[1]-cursor_actual[1])
+
         if cursor_actual[0]<cursor_at[0]:           #-->
-            if cursor_actual[1]<cursor_at[1]:           #ABAJO
-                camera_theta2 -= 2*(cursor_at[1]-cursor_actual[1])/500#* dt
+            if cursor_actual[1]<cursor_at[1] :           #ABAJO
+                camera_theta2 -= 2*(cursor_at[1]-cursor_actual[1])/500#abajo
                 camera_theta += 2* (cursor_at[0]-cursor_actual[0])/500
             if cursor_actual[1]>cursor_at[1]:
                 camera_theta2 += 2* (cursor_actual[1]-cursor_at[1])/500
                 camera_theta += 2* (cursor_at[0]-cursor_actual[0])/500
-            cursor_actual = cursor_at
+            
 
         
-        if cursor_actual[0]>cursor_at[0]:               
+        elif cursor_actual[0]>cursor_at[0]:       
             if cursor_actual[1]<cursor_at[1]:
-                camera_theta2 -= 2* (cursor_at[1]-cursor_actual[1])/500
+                camera_theta2 -= 2* (cursor_at[1]-cursor_actual[1])/500  #abajo
                 camera_theta -= 2* (cursor_actual[0]-cursor_at[0])/500
             if cursor_actual[1]>cursor_at[1]:
                 camera_theta2 += 2* (cursor_actual[1]-cursor_at[1])/500
                 camera_theta -= 2* (cursor_actual[0]-cursor_at[0])/500
-            cursor_actual = cursor_at
 
+        #else:
+        #    cursor_limite[0]-=(cursor_at[0]-cursor_actual[0])
+        #    cursor_limite[1]-=(cursor_at[1]-cursor_actual[1])
+            
+        cursor_actual = cursor_at
+        
 
-        #print(cursor_at,cursor_actual)
+        print(cursor_at,cursor_actual,cursor_limite)
+        cursor_at=(cursor_at[0],748)
 
 
         if (glfw.get_key(window, glfw.KEY_LEFT) == glfw.PRESS):
@@ -501,6 +559,8 @@ if __name__ == "__main__":
         camaraY=c[counter][1]
         camaraZ=c[counter][2]
 
+
+
         posicion_siguienteX = c[counter+1][0]
         posicion_siguienteY = c[counter+1][1]
         posicion_siguienteZ = c[counter+1][2]
@@ -561,21 +621,28 @@ if __name__ == "__main__":
         camY = R * np.cos(camera_theta) * np.sin(camera_theta2)
         camZ = R * np.cos(camera_theta2)
 
+        headX = R * np.sin(camera_theta) * np.sin(camera_theta2+np.pi/2)
+        headY = R * np.cos(camera_theta) * np.sin(camera_theta2+np.pi/2)
+        headZ = R * np.cos(camera_theta2+np.pi/2)
+        
+        
         if counter==len(c)-4:      #0.998995994995999 -1.000998997997999
             counter=0
         counter+=1
 
-        viewPos2 = np.array([0, 0, 0])    
-        viewPos = np.array([camX, camY, camZ])
+        viewPos2 = np.array([5, 5, 5])    
+        viewPos = np.array([camX+5, camY+5, camZ])
 
 
         view = tr.lookAt(
             viewPos2,
             #np.array([0,0,1]),
             viewPos,
-            np.array([ 0,0,1])
+            #np.array([ 0,0,1])
+            np.array([ headX,headY,headZ])
         )
         #Dnd esta, hacia a donde ,para arriba
+
 
         # Setting up the projection transform
         projection = tr.perspective(60, float(width)/float(height), 0.001, 500)
