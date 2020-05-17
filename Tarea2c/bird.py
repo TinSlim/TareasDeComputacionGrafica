@@ -57,12 +57,12 @@ def on_key(window, key, scancode, action, mods):
 
 
 def pajaro():
-    gpuCabeza = es.toGPUShape(rbj.readOBJ("Model/cabeza.obj", (0,1,1)))
-    gpuTorso = es.toGPUShape(rbj.readOBJ("Model/torso.obj", (0,1,1)))
+    gpuCabeza = es.toGPUShape(rbj.readOBJ("Model/cabeza.obj", (0,1,0.8)))
+    gpuTorso = es.toGPUShape(rbj.readOBJ("Model/torso.obj", (0,0.8,1)))
     gpuAlaSupDer = es.toGPUShape(rbj.readOBJ("Model/alasupder.obj", (0,1,1)))
-    gpuAlaInfDer = es.toGPUShape(rbj.readOBJ("Model/alainfder.obj", (0,1,1)))
+    gpuAlaInfDer = es.toGPUShape(rbj.readOBJ("Model/alainfder.obj", (0,0.7,1)))
     gpuAlaSupIzq = es.toGPUShape(rbj.readOBJ("Model/alasupizq.obj", (0,1,1)))
-    gpuAlaInfIzq = es.toGPUShape(rbj.readOBJ("Model/alainfizq.obj", (0,1,1)))
+    gpuAlaInfIzq = es.toGPUShape(rbj.readOBJ("Model/alainfizq.obj", (0,0.7,1)))
 
     #################Ala Derecha
     #Ala inf derecha
@@ -161,8 +161,8 @@ if __name__ == "__main__":
 
     # Defining shader programs
     #pipeline = ls.SimpleFlatShaderProgram()
-    pipeline = ls.SimpleGouraudShaderProgram()
-    #pipeline = ls.SimplePhongShaderProgram()
+    #pipeline = ls.SimpleGouraudShaderProgram()
+    pipeline = ls.SimplePhongShaderProgram()
     mvpPipeline = es.SimpleModelViewProjectionShaderProgram()
 
     # Telling OpenGL to use our shader program
@@ -177,10 +177,10 @@ if __name__ == "__main__":
 
     # Creating shapes on GPU memory
     gpuAxis = es.toGPUShape(bs.createAxis(7))
-    #gpuSuzanne = es.toGPUShape(shape = readOBJ('suzanne.obj', (0.9,0.6,0.2)))
+    
     gpuSuzanne = es.toGPUShape(shape = rbj.readOBJ('Model/alasupder.obj', (0.9,0.6,0.2)))
     pajarito=pajaro()
-    #gpuCarrot = es.toGPUShape(shape = readOBJ('carrot.obj', (0.6,0.9,0.5)))
+
 
     
     Ala_Inf_Izquierda=sg.findNode(pajarito, "RotacionAlaInfIzquierda")
@@ -235,13 +235,13 @@ if __name__ == "__main__":
         Pajaro2.transform = tr.matmul([tr.rotationX(np.pi*(1/2)),tr.rotationY(control.f+np.pi/2)])
         
 
-        R = 12
+        R = 13
         camX = R * np.sin(camera_theta)
         camY = R * np.cos(camera_theta)
-        viewPos = np.array([camX, camY, 7])
+        viewPos = np.array([camX, camY,3])
         view = tr.lookAt(
             viewPos,
-            np.array([0,0,1]),
+            np.array([0,0,-1]),
             np.array([0,0,1])
         )
 
@@ -296,7 +296,7 @@ if __name__ == "__main__":
         glUniformMatrix4fv(glGetUniformLocation(mvpPipeline.shaderProgram, "projection"), 1, GL_TRUE, projection)
         glUniformMatrix4fv(glGetUniformLocation(mvpPipeline.shaderProgram, "view"), 1, GL_TRUE, view)
         glUniformMatrix4fv(glGetUniformLocation(mvpPipeline.shaderProgram, "model"), 1, GL_TRUE, tr.identity())
-        mvpPipeline.drawShape(gpuAxis, GL_LINES)
+        #mvpPipeline.drawShape(gpuAxis, GL_LINES)
 
         # Once the drawing is rendered, buffers are swap so an uncomplete drawing is never seen.
         glfw.swap_buffers(window)
