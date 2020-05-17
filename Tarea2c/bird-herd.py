@@ -17,7 +17,12 @@ import Modulo.csvtolist_nuevo as cv
 import Modulo.curvas as crv
 
 #######################
-a=cv.parsear_archivo("path2.csv")
+try:
+    archivo_csv=str(sys.argv[1])
+except:
+    archivo_csv="path2.csv"
+##################
+a=cv.parsear_archivo(archivo_csv)
 lista=[]
 lista_pequenia=[]
 lista.append(a[len(a)-1])
@@ -264,11 +269,11 @@ def createTextureCube(image_filename):
 def createWall():
     Gpu1 = es.toGPUShape(createTextureCube("espacio.png"),GL_REPEAT,GL_LINEAR)
     Gpu2 = es.toGPUShape(bs.createTextureQuad("sol.jpg"),GL_REPEAT,GL_LINEAR)
-    Gpu3 = es.toGPUShape(bs.createTextureQuad("satelite.jpg"),GL_REPEAT,GL_LINEAR)
+    Gpu3 = es.toGPUShape(bs.createTextureQuad("satelite.png"),GL_CLAMP_TO_EDGE,GL_LINEAR)
 
     Satelite = sg.SceneGraphNode("Satelite")
     Satelite.childs += [Gpu3]
-    Satelite.transform = tr.matmul([tr.rotationZ(1),tr.rotationY(np.pi/2),])
+    Satelite.transform = tr.matmul([tr.uniformScale(0.7),tr.rotationZ(10),tr.rotationY(np.pi/2),])
 
     Sol = sg.SceneGraphNode("Sol")
     Sol.childs += [Gpu2]
@@ -309,6 +314,9 @@ if __name__ == "__main__":
     # Connecting the callback function 'on_key' to handle keyboard events
     glfw.set_key_callback(window, on_key)
 
+    #Transparency
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
     # Defining shader programs
     #pipeline = ls.SimpleFlatShaderProgram()
@@ -338,6 +346,8 @@ if __name__ == "__main__":
 
     Fondo = createWall()
     #Fondo = fondo()
+    Satelite_nodo = sg.findNode(Fondo,"Satelite")
+
     #####################################################
     ##Se crean 5 pájaros y se guardan los nodos que se usarán despues##
     #####################################################
@@ -500,7 +510,7 @@ if __name__ == "__main__":
             camera_theta2 -= 2* dt
 
         
-
+        
 
         ############################
         ##Movimiento de Alas automático##
@@ -708,7 +718,7 @@ if __name__ == "__main__":
         glUniformMatrix4fv(glGetUniformLocation(mvpPipeline.shaderProgram, "projection"), 1, GL_TRUE, projection)
         glUniformMatrix4fv(glGetUniformLocation(mvpPipeline.shaderProgram, "view"), 1, GL_TRUE, view)
         glUniformMatrix4fv(glGetUniformLocation(mvpPipeline.shaderProgram, "model"), 1, GL_TRUE, tr.identity())
-        mvpPipeline.drawShape(gpuAxis, GL_LINES)
+        #mvpPipeline.drawShape(gpuAxis, GL_LINES)
 
 
         # Once the drawing is rendered, buffers are swap so an uncomplete drawing is never seen.
