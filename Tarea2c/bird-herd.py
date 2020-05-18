@@ -89,8 +89,8 @@ def on_key(window, key, scancode, action, mods):
         sys.exit()
 
 def fondo():
-    GpuSuelo = es.toGPUShape(bs.createTextureQuad("campo.jpg"),GL_REPEAT,GL_LINEAR)
-    GpuPared = es.toGPUShape(bs.createTextureQuad("Fondo2.png"),GL_REPEAT,GL_LINEAR)
+    GpuSuelo = es.toGPUShape(bs.createTextureQuad("Texturas/campo.jpg"),GL_REPEAT,GL_LINEAR)
+    GpuPared = es.toGPUShape(bs.createTextureQuad("Texturas/Fondo2.png"),GL_REPEAT,GL_LINEAR)
 
 
     suelo = sg.SceneGraphNode("Suelo")
@@ -267,9 +267,9 @@ def createTextureCube(image_filename):
 
 
 def createWall():
-    Gpu1 = es.toGPUShape(createTextureCube("espacio.png"),GL_REPEAT,GL_LINEAR)
-    Gpu2 = es.toGPUShape(bs.createTextureQuad("sol.jpg"),GL_REPEAT,GL_LINEAR)
-    Gpu3 = es.toGPUShape(bs.createTextureQuad("satelite.png"),GL_CLAMP_TO_EDGE,GL_LINEAR)
+    Gpu1 = es.toGPUShape(createTextureCube("Texturas/espacio.png"),GL_REPEAT,GL_LINEAR)
+    Gpu2 = es.toGPUShape(bs.createTextureQuad("Texturas/sol.jpg"),GL_REPEAT,GL_LINEAR)
+    Gpu3 = es.toGPUShape(bs.createTextureQuad("Texturas/satelite.png"),GL_CLAMP_TO_EDGE,GL_LINEAR)
 
     Satelite = sg.SceneGraphNode("Satelite")
     Satelite.childs += [Gpu3]
