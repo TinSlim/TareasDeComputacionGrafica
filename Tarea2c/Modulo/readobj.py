@@ -1,3 +1,5 @@
+import Modulo.basic_shapes as bs
+
 def readFaceVertex(faceDescription):
 
     aux = faceDescription.split('/')
