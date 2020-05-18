@@ -1,3 +1,4 @@
+##Bibliotecas##
 import glfw
 from glfw.GLFW import *
 
@@ -6,6 +7,7 @@ import OpenGL.GL.shaders
 import numpy as np
 import sys
 
+##Módulos
 import Modulo.transformations as tr
 import Modulo.basic_shapes as bs
 import Modulo.scene_graph as sg
@@ -16,12 +18,16 @@ import Modulo.lighting_shaders as ls
 import Modulo.csvtolist_nuevo as cv
 import Modulo.curvas as crv
 
-#######################
+
+##Recibe entrada del usuario, en caso de no haber usa un camino predeterminado
 try:
     archivo_csv=str(sys.argv[1])
 except:
     archivo_csv="path2.csv"
 ##################
+
+
+##Se trabajan los puntos del archivo csv
 a=cv.parsear_archivo(archivo_csv)
 lista=[]
 lista_pequenia=[]
@@ -40,10 +46,11 @@ for punto in lista:
 
 b=crv.curvas_pajaros(lista2)
 
+##Curva final con todos los puntos concatenados
 c=crv.concatenacion(b)
 
 
-
+##Clase controller para guardas variables
 class controller():
     angulo=-0.1
     rotation_y=0.1
@@ -60,34 +67,22 @@ class controller():
 
     alasSubiendo=True
 
+    Fondo1 = True
+##Se instancia un control
 control=controller()
 
+##Botones, barra espaciadora permite cambiar la escena, Esc permite salir del programa
 def on_key(window, key, scancode, action, mods):
     if action != glfw.PRESS:
         return
-    
-    elif key == glfw.KEY_SPACE:
-        control.angulo+=0.1
 
-    elif key == glfw.KEY_Q:
-        control.angulo-=0.1
-
-    elif key == glfw.KEY_F:
-        control.rotacion_alas-=0.1
-
-    elif key == glfw.KEY_G:
-        control.rotacion_alas-=0.1
-
-
-    elif key == glfw.KEY_M:
-        control.rotation_y+=0.1
-
-    elif key == glfw.KEY_N:
-        control.rotation_y-=0.1
+    if key == glfw.KEY_SPACE:
+        control.Fondo1 = not control.Fondo1
 
     elif key == glfw.KEY_ESCAPE:
         sys.exit()
 
+##Fondo 1
 def fondo():
     GpuSuelo = es.toGPUShape(bs.createTextureQuad("Texturas/campo.jpg"),GL_REPEAT,GL_LINEAR)
     GpuPared = es.toGPUShape(bs.createTextureQuad("Texturas/Fondo2.png"),GL_REPEAT,GL_LINEAR)
@@ -95,7 +90,7 @@ def fondo():
 
     suelo = sg.SceneGraphNode("Suelo")
     suelo.childs+=[GpuSuelo]
-    suelo.transform = tr.matmul([tr.uniformScale(55),tr.translate(0,0,-1)])
+    suelo.transform = tr.matmul([tr.uniformScale(55),tr.translate(0,0,0)])
 
     pared1 = sg.SceneGraphNode("pared1")
     pared1.childs+=[GpuPared]
@@ -123,6 +118,7 @@ def fondo():
     return Fondo
 
 
+##Pájaro
 def pajaro():
     gpuCabeza = es.toGPUShape(rbj.readOBJ("Model/cabeza.obj", (0,0.5,0.8)))
     gpuTorso = es.toGPUShape(rbj.readOBJ("Model/torso.obj", (1,1,0.3)))
@@ -210,6 +206,7 @@ def pajaro():
 
     return Pajaro
 
+##Para crear un cubo con una textura en un orden específico
 def createTextureCube(image_filename):
 
     # Defining locations and texture coordinates for each vertex of the shape  
@@ -266,6 +263,7 @@ def createTextureCube(image_filename):
     return bs.Shape(vertices, indices, image_filename)
 
 
+##Fondo2, a partir de un cubo
 def createWall():
     Gpu1 = es.toGPUShape(createTextureCube("Texturas/espacio.png"),GL_REPEAT,GL_LINEAR)
     Gpu2 = es.toGPUShape(bs.createTextureQuad("Texturas/sol.jpg"),GL_REPEAT,GL_LINEAR)
@@ -344,9 +342,9 @@ if __name__ == "__main__":
     gpuSuzanne = es.toGPUShape(shape = rbj.readOBJ('Model/alasupder.obj', (0.9,0.6,0.2)))
     
 
-    Fondo = createWall()
-    #Fondo = fondo()
-    Satelite_nodo = sg.findNode(Fondo,"Satelite")
+    Fondo1 = createWall()
+    Fondo2 = fondo()
+    Satelite_nodo = sg.findNode(Fondo1,"Satelite")
 
     #####################################################
     ##Se crean 5 pájaros y se guardan los nodos que se usarán despues##
@@ -601,7 +599,9 @@ if __name__ == "__main__":
         #Pajaro2.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(angulo_pajaro)])
        
 
-
+        #################
+        ##Rotación pájaros##
+        #################
         #Rotacion respecto a su eje
         if angulo_pajaro>control.angulo_pajaro:
             control.angulo_pajaro+=0.01
@@ -665,6 +665,11 @@ if __name__ == "__main__":
         #    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
         #else:
         #    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+
+        if control.Fondo1:
+            Fondo = Fondo1
+        else:
+            Fondo = Fondo2
 
         glUseProgram(mvpTPipeline.shaderProgram)
         glUniformMatrix4fv(glGetUniformLocation(mvpTPipeline.shaderProgram, "projection"), 1, GL_TRUE, projection)
