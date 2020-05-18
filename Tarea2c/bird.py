@@ -1,17 +1,20 @@
+##Bibliotecas
 import glfw
 from OpenGL.GL import *
 import OpenGL.GL.shaders
 import numpy as np
 import sys
 
+##Módulos
 import Modulo.transformations as tr
 import Modulo.basic_shapes as bs
 import Modulo.scene_graph as sg
 import Modulo.easy_shaders as es
 import Modulo.readobj as rbj
 import Modulo.lighting_shaders as ls
-#import lighting_shaders as ls
 
+
+##Control para guardar variables
 class controller():
     angulo=-0.1
     rotacion_alas=0
@@ -19,8 +22,11 @@ class controller():
     rotation_x=-1.6#0
     f=0
 
+##Se instancia un control
 control=controller()
 
+
+##Para salir del programa, presionar Esc
 def on_key(window, key, scancode, action, mods):
     if action != glfw.PRESS:
         return
@@ -30,8 +36,7 @@ def on_key(window, key, scancode, action, mods):
 
 
 
-
-
+##Armado del pájaro
 def pajaro():
     gpuCabeza = es.toGPUShape(rbj.readOBJ("Model/cabeza.obj", (0,1,0.8)))
     gpuTorso = es.toGPUShape(rbj.readOBJ("Model/torso.obj", (0,0.8,1)))
@@ -124,7 +129,7 @@ if __name__ == "__main__":
     width = 600
     height = 600
 
-    window = glfw.create_window(width, height, "Reading a *.obj file", None, None)
+    window = glfw.create_window(width, height, "Bird", None, None)
 
     if not window:
         glfw.terminate()
@@ -154,11 +159,10 @@ if __name__ == "__main__":
     # Creating shapes on GPU memory
     gpuAxis = es.toGPUShape(bs.createAxis(7))
     
-    gpuSuzanne = es.toGPUShape(shape = rbj.readOBJ('Model/alasupder.obj', (0.9,0.6,0.2)))
+    # Armado del pájaro
     pajarito=pajaro()
 
-
-    
+    # Se guardan los nodos que se rotarán
     Ala_Inf_Izquierda=sg.findNode(pajarito, "RotacionAlaInfIzquierda")
     Ala_Inf_Derecha=sg.findNode(pajarito, "RotacionAlaInfDerecha")
     
@@ -166,7 +170,7 @@ if __name__ == "__main__":
     Ala_Izquierda = sg.findNode(pajarito, "AlaIzquierda")
     Pajaro2 = sg.findNode(pajarito, "Pajaro1")
     
-    #Config inicial
+    #Configuración inicial de las articulaciones
     Ala_Inf_Izquierda.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
     Ala_Inf_Derecha.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
 
@@ -174,7 +178,7 @@ if __name__ == "__main__":
     Ala_Izquierda.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
 
 
-
+    #Configuración inicial tiempo y ángulo de la cámara
     t0 = glfw.get_time()
     camera_theta = -3*np.pi/4
 
@@ -188,6 +192,7 @@ if __name__ == "__main__":
         dt = t1 - t0
         t0 = t1
 
+        #Para rotar la cámara
         if (glfw.get_key(window, glfw.KEY_LEFT) == glfw.PRESS):
             camera_theta -= 2 * dt
 
@@ -196,9 +201,8 @@ if __name__ == "__main__":
 
 
 
-        ######################################
-        
-        
+
+        #Si el cursor está dentro de los límites superior e inferior de la pantalla, se mueven las alas      
         if cursor_at[1]<600 and cursor_at[1]>0:
             Ala_Inf_Izquierda.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo+0.00215*cursor_at[1])),tr.translate(-1.5,2,2)])
             Ala_Inf_Derecha.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo+0.00215*cursor_at[1]),tr.translate(1.5,2,2)])
@@ -207,10 +211,11 @@ if __name__ == "__main__":
             Ala_Izquierda.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y-0.0045*cursor_at[1])),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
         #
 
-
+        #Rotación del pájaro completo
         Pajaro2.transform = tr.matmul([tr.rotationX(np.pi*(1/2)),tr.rotationY(control.f+np.pi/2)])
         
 
+        #Manejo de la cámara
         R = 13
         camX = R * np.sin(camera_theta)
         camY = R * np.cos(camera_theta)
@@ -232,6 +237,7 @@ if __name__ == "__main__":
         #    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
         #else:
         #    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+
 
         # Drawing shapes
         glUseProgram(pipeline.shaderProgram)
@@ -255,18 +261,17 @@ if __name__ == "__main__":
         glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE, tr.uniformScale(3))
 
 
-        ###
+        #Se usa el pipeline de sombras y luz para el dibujo del pájaro
         sg.drawSceneGraphNode(pajarito, pipeline, "model")
-        #pipeline.drawShape(gpuSuzanne)
 
-            ##
+        
         glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE,
             tr.matmul([
                 tr.uniformScale(3),
                 tr.rotationX(np.pi/2),
                 tr.translate(1.5,-0.25,0)])
         )
-        #pipeline.drawShape(gpuCarrot)
+        
         
         glUseProgram(mvpPipeline.shaderProgram)
         glUniformMatrix4fv(glGetUniformLocation(mvpPipeline.shaderProgram, "projection"), 1, GL_TRUE, projection)
