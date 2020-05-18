@@ -25,30 +25,6 @@ def on_key(window, key, scancode, action, mods):
     if action != glfw.PRESS:
         return
     
-    elif key == glfw.KEY_SPACE:
-        control.angulo+=0.1
-
-    elif key == glfw.KEY_Q:
-        control.angulo-=0.1
-
-    elif key == glfw.KEY_F:
-        control.rotacion_alas-=0.1
-
-    elif key == glfw.KEY_G:
-        control.rotacion_alas-=0.1
-
-    elif key == glfw.KEY_B:
-        control.rotation_x+=0.1
-
-    elif key == glfw.KEY_V:
-        control.rotation_x-=0.1
-
-    elif key == glfw.KEY_M:
-        control.rotation_y+=0.1
-
-    elif key == glfw.KEY_N:
-        control.rotation_y-=0.1
-
     elif key == glfw.KEY_ESCAPE:
         sys.exit()
 
