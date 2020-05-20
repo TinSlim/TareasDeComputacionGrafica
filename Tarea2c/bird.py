@@ -1,3 +1,6 @@
+"""Cristóbal Torres Gutiérrez"""
+
+
 ##Bibliotecas
 import glfw
 from OpenGL.GL import *
