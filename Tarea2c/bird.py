@@ -66,31 +66,33 @@ def pajaro():
     AlaDerecha.childs+=[RotacionAlaInfDerecha]
     AlaDerecha.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationY(np.pi),tr.rotationX(np.pi),tr.translate(1,2.5,0)])  #AlaDerecha.transform = tr.matmul([tr.translate(0,-2,0),tr.rotationX(np.pi*(2/3)),tr.translate(0,2,0.5)])#
 
-    #############        tr.rotationX(np.pi)
-    #Ala inf derecha
+    ################# Ala Izquierda
+    #Ala inf izquierda
     AlaInfIzquierda = sg.SceneGraphNode("AlaInfIzquierda")
     AlaInfIzquierda.transform = tr.translate(0,0,0)  #Ajustar bn
     AlaInfIzquierda.childs+=[gpuAlaInfIzq]
 
-    #Rotación ala inf derecha
+    #Rotación ala inf izquierda
     RotacionAlaInfIzquierda = sg.SceneGraphNode("RotacionAlaInfIzquierda") 
     RotacionAlaInfIzquierda.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-np.pi/3),tr.translate(-1,2,2)])
     RotacionAlaInfIzquierda.childs+= [AlaInfIzquierda]
 
-    #Ala sup derecha
+    #Ala sup izquierda
     AlaSupIzquierda = sg.SceneGraphNode("AlaSupIzquierda")
     AlaSupIzquierda.childs+=[gpuAlaSupIzq]
 
-    #Ala derecha
+    #Ala izquierda
     AlaIzquierda = sg.SceneGraphNode("AlaIzquierda")
     AlaIzquierda.childs+=[AlaSupIzquierda]
     AlaIzquierda.childs+=[RotacionAlaInfIzquierda]
     
+    ################# Ambas Alas
     #Alas
     Alas = sg.SceneGraphNode("Alas")
     Alas.childs+=[AlaDerecha]
     Alas.childs+=[AlaIzquierda]
 
+    ################# Cuerpo
     #Torso
     Torso = sg.SceneGraphNode("Torso")
     Torso.childs+= [gpuTorso]
@@ -107,6 +109,7 @@ def pajaro():
     Cuerpo.childs+= [Torso]
     Cuerpo.childs+= [Cabeza]
 
+    ################# Pájaro
     #Pajaro Total1
     Pajaro1 = sg.SceneGraphNode("Pajaro1")
     Pajaro1.childs+=[Alas]
@@ -126,6 +129,7 @@ if __name__ == "__main__":
     if not glfw.init():
         sys.exit()
 
+    #Tamaño ventana
     width = 600
     height = 600
 
@@ -140,11 +144,8 @@ if __name__ == "__main__":
     # Connecting the callback function 'on_key' to handle keyboard events
     glfw.set_key_callback(window, on_key)
 
-    # Defining shader programs
-    #pipeline = ls.SimpleFlatShaderProgram()
-    #pipeline = ls.SimpleGouraudShaderProgram()
+    # Pipeline
     pipeline = ls.SimplePhongShaderProgram()
-    mvpPipeline = es.SimpleModelViewProjectionShaderProgram()
 
     # Telling OpenGL to use our shader program
     glUseProgram(pipeline.shaderProgram)
@@ -157,10 +158,8 @@ if __name__ == "__main__":
     glEnable(GL_DEPTH_TEST)
 
     # Creating shapes on GPU memory
-    gpuAxis = es.toGPUShape(bs.createAxis(7))
-    
-    # Armado del pájaro
     pajarito=pajaro()
+    
 
     # Se guardan los nodos que se rotarán
     Ala_Inf_Izquierda=sg.findNode(pajarito, "RotacionAlaInfIzquierda")
@@ -200,8 +199,6 @@ if __name__ == "__main__":
             camera_theta += 2* dt
 
 
-
-
         #Si el cursor está dentro de los límites superior e inferior de la pantalla, se mueven las alas      
         if cursor_at[1]<600 and cursor_at[1]>0:
             Ala_Inf_Izquierda.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo+0.00215*cursor_at[1])),tr.translate(-1.5,2,2)])
@@ -209,7 +206,7 @@ if __name__ == "__main__":
 
             Ala_Derecha.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y-0.0045*cursor_at[1]),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
             Ala_Izquierda.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y-0.0045*cursor_at[1])),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
-        #
+
 
         #Rotación del pájaro completo
         Pajaro2.transform = tr.matmul([tr.rotationX(np.pi*(1/2)),tr.rotationY(control.f+np.pi/2)])
@@ -231,12 +228,6 @@ if __name__ == "__main__":
 
         # Clearing the screen in both, color and depth
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
-        # Filling or not the shapes depending on the controller state
-        #if (controller.fillPolygon):
-        #    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-        #else:
-        #    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
 
         # Drawing shapes
@@ -271,13 +262,7 @@ if __name__ == "__main__":
                 tr.rotationX(np.pi/2),
                 tr.translate(1.5,-0.25,0)])
         )
-        
-        
-        glUseProgram(mvpPipeline.shaderProgram)
-        glUniformMatrix4fv(glGetUniformLocation(mvpPipeline.shaderProgram, "projection"), 1, GL_TRUE, projection)
-        glUniformMatrix4fv(glGetUniformLocation(mvpPipeline.shaderProgram, "view"), 1, GL_TRUE, view)
-        glUniformMatrix4fv(glGetUniformLocation(mvpPipeline.shaderProgram, "model"), 1, GL_TRUE, tr.identity())
-        #mvpPipeline.drawShape(gpuAxis, GL_LINES)
+    
 
         # Once the drawing is rendered, buffers are swap so an uncomplete drawing is never seen.
         glfw.swap_buffers(window)
