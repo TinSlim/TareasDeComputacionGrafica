@@ -23,7 +23,7 @@ import Modulo.curvas as crv
 try:
     archivo_csv=str(sys.argv[1])
 except:
-    archivo_csv="path2.csv"
+    archivo_csv="path.csv"
 ##################
 
 
@@ -109,6 +109,7 @@ def fondo():
     pared4.transform = tr.matmul([tr.translate(-55,0,15),tr.scale(1,125,45),tr.rotationX(np.pi/2),tr.rotationY(np.pi/2)])
 
     Fondo = sg.SceneGraphNode("Fondo")
+    Fondo.transform = tr.translate(0,0,-1)
     Fondo.childs+= [suelo]
     Fondo.childs+= [pared1]
     Fondo.childs+= [pared2] 
@@ -627,13 +628,13 @@ if __name__ == "__main__":
         # 1.3     2.7
         #0.00216         0.004500
         R = 12
-        camX = R * np.sin(camera_theta) * np.sin(camera_theta2)
-        camY = R * np.cos(camera_theta) * np.sin(camera_theta2)
-        camZ = R * np.cos(camera_theta2)
+        camX = R * np.sin(camera_theta+3) * np.sin(camera_theta2-2)
+        camY = R * np.cos(camera_theta+3) * np.sin(camera_theta2-2)
+        camZ = R * np.cos(camera_theta2-2)
 
-        headX = R * np.sin(camera_theta) * np.sin(camera_theta2+np.pi/2)
-        headY = R * np.cos(camera_theta) * np.sin(camera_theta2+np.pi/2)
-        headZ = R * np.cos(camera_theta2+np.pi/2)
+        headX = R * np.sin(camera_theta+3) * np.sin(camera_theta2-2+np.pi/2)
+        headY = R * np.cos(camera_theta+3) * np.sin(camera_theta2-2+np.pi/2)
+        headZ = R * np.cos(camera_theta2-2+np.pi/2)
         
         
         if counter==len(c)-4:      #0.998995994995999 -1.000998997997999
