@@ -86,14 +86,14 @@ def on_key(window, key, scancode, action, mods):
 def fondo():
     GpuSuelo = es.toGPUShape(bs.createTextureQuad("Texturas/campo.jpg"),GL_REPEAT,GL_LINEAR)
     GpuPared = es.toGPUShape(bs.createTextureQuad("Texturas/Fondo2.png"),GL_REPEAT,GL_LINEAR)
-
+    GpuPared2 = es.toGPUShape(bs.createTextureQuad("Texturas/Fondo2Nubes.png"),GL_REPEAT,GL_LINEAR)
 
     suelo = sg.SceneGraphNode("Suelo")
     suelo.childs+=[GpuSuelo]
     suelo.transform = tr.matmul([tr.uniformScale(55),tr.translate(0,0,0)])
 
     pared1 = sg.SceneGraphNode("pared1")
-    pared1.childs+=[GpuPared]
+    pared1.childs+=[GpuPared2]
     pared1.transform = tr.matmul([tr.translate(0,55,15),tr.scale(125,1,45),tr.rotationX(np.pi/2)])
 
     pared2 = sg.SceneGraphNode("pared2")
@@ -105,7 +105,7 @@ def fondo():
     pared3.transform = tr.matmul([tr.translate(50,0,15),tr.scale(1,125,45),tr.rotationX(np.pi/2),tr.rotationY(np.pi/2)])
 
     pared4 = sg.SceneGraphNode("pared4")
-    pared4.childs+=[GpuPared]
+    pared4.childs+=[GpuPared2]
     pared4.transform = tr.matmul([tr.translate(-55,0,15),tr.scale(1,125,45),tr.rotationX(np.pi/2),tr.rotationY(np.pi/2)])
 
     Fondo = sg.SceneGraphNode("Fondo")
@@ -492,7 +492,7 @@ if __name__ == "__main__":
         cursor_actual = cursor_at
         
 
-        print(cursor_at,cursor_actual,cursor_limite)
+        #print(cursor_at,cursor_actual,cursor_limite)
         cursor_at=(cursor_at[0],748)
 
 
