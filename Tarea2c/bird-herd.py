@@ -1,4 +1,7 @@
-##Bibliotecas##
+"""Cristóbal Torres Gutiérrez"""
+
+
+##Bibliotecas
 import glfw
 from glfw.GLFW import *
 
