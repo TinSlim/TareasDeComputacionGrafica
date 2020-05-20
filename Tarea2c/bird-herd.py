@@ -24,7 +24,7 @@ try:
     archivo_csv=str(sys.argv[1])
 except:
     archivo_csv="path.csv"
-##################
+
 
 
 ##Se trabajan los puntos del archivo csv
@@ -68,6 +68,7 @@ class controller():
     alasSubiendo=True
 
     Fondo1 = True
+
 ##Se instancia un control
 control=controller()
 
@@ -298,10 +299,11 @@ if __name__ == "__main__":
     if not glfw.init():
         sys.exit()
 
+    ##Tamaño ventana
     width = 600
     height = 600
     
-    window = glfw.create_window(width, height, "Reading a *.obj file", None, None)
+    window = glfw.create_window(width, height, "Bird-Herd", None, None)
     glfw.set_input_mode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
 
     if not window:
@@ -318,10 +320,7 @@ if __name__ == "__main__":
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
     # Defining shader programs
-    #pipeline = ls.SimpleFlatShaderProgram()
     pipeline = ls.SimplePhongShaderProgram()
-    #pipeline = ls.SimplePhongShaderProgram()
-    mvpPipeline = es.SimpleModelViewProjectionShaderProgram()
     mvpTPipeline = es.SimpleTextureModelViewProjectionShaderProgram()
 
     # Telling OpenGL to use our shader program
@@ -337,11 +336,6 @@ if __name__ == "__main__":
 
     # Creating shapes on GPU memory
     gpuAxis = es.toGPUShape(bs.createAxis(7))
-    #gpuSuzanne = es.toGPUShape(shape = readOBJ('suzanne.obj', (0.9,0.6,0.2)))
-    #gpuCarrot = es.toGPUShape(shape = readOBJ('carrot.obj', (0.6,0.9,0.5)))
-
-    gpuSuzanne = es.toGPUShape(shape = rbj.readOBJ('Model/alasupder.obj', (0.9,0.6,0.2)))
-    
 
     Fondo1 = createWall()
     Fondo2 = fondo()
@@ -435,7 +429,7 @@ if __name__ == "__main__":
     Ala_Izquierda5.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
     #########
 
-
+    #Variables iniciales
     rotacion_pajaro=0
 
     t0 = glfw.get_time()
@@ -446,13 +440,12 @@ if __name__ == "__main__":
 
     cursor_at = glfw.get_cursor_pos(window)
     cursor_actual=cursor_at
-    cursor_limite = [cursor_actual[0],cursor_actual[1]]
+
     while not glfw.window_should_close(window):
         # Using GLFW to check for input events
-        
-
-
         glfw.poll_events()
+
+        ##Ubicación del cursor
         cursor_at = glfw.get_cursor_pos(window)
         
 
@@ -461,54 +454,26 @@ if __name__ == "__main__":
         dt = t1 - t0
         t0 = t1
 
-        
-
-
-        cursor_limite[0] += (cursor_at[0]-cursor_actual[0])
-        cursor_limite[1] += (cursor_at[1]-cursor_actual[1])
-
-        if cursor_actual[0]<cursor_at[0]:           #-->
-            if cursor_actual[1]<cursor_at[1] :           #ABAJO
-                camera_theta2 -= 2*(cursor_at[1]-cursor_actual[1])/500#abajo
+        ##Acciones del cursor
+        if cursor_actual[0]<cursor_at[0]:        #Si se mueve a la derecha
+            if cursor_actual[1]<cursor_at[1] :      #Si se mueve hacia abajo
+                camera_theta2 -= 2*(cursor_at[1]-cursor_actual[1])/500
                 camera_theta += 2* (cursor_at[0]-cursor_actual[0])/500
-            if cursor_actual[1]>cursor_at[1]:
+            if cursor_actual[1]>cursor_at[1]:        #Si se mueve havia arriba
                 camera_theta2 += 2* (cursor_actual[1]-cursor_at[1])/500
                 camera_theta += 2* (cursor_at[0]-cursor_actual[0])/500
             
 
-        
-        elif cursor_actual[0]>cursor_at[0]:       
-            if cursor_actual[1]<cursor_at[1]:
-                camera_theta2 -= 2* (cursor_at[1]-cursor_actual[1])/500  #abajo
+        elif cursor_actual[0]>cursor_at[0]:      #Si se mueve a la izquierda  
+            if cursor_actual[1]<cursor_at[1]:        #Si se mueve hacia abajo
+                camera_theta2 -= 2* (cursor_at[1]-cursor_actual[1])/500  
                 camera_theta -= 2* (cursor_actual[0]-cursor_at[0])/500
-            if cursor_actual[1]>cursor_at[1]:
+            if cursor_actual[1]>cursor_at[1]:         #Si se mueve hacia arriba
                 camera_theta2 += 2* (cursor_actual[1]-cursor_at[1])/500
                 camera_theta -= 2* (cursor_actual[0]-cursor_at[0])/500
 
-        #else:
-        #    cursor_limite[0]-=(cursor_at[0]-cursor_actual[0])
-        #    cursor_limite[1]-=(cursor_at[1]-cursor_actual[1])
-            
-        cursor_actual = cursor_at
-        
-
-        #print(cursor_at,cursor_actual,cursor_limite)
-        cursor_at=(cursor_at[0],748)
-
-
-        if (glfw.get_key(window, glfw.KEY_LEFT) == glfw.PRESS):
-            camera_theta -= 2 * dt
-
-        if (glfw.get_key(window, glfw.KEY_RIGHT) == glfw.PRESS):
-            camera_theta += 2* dt
-        
-        if (glfw.get_key(window, glfw.KEY_UP) == glfw.PRESS):
-            camera_theta2 += 2* dt
-        
-        if (glfw.get_key(window, glfw.KEY_DOWN) == glfw.PRESS):
-            camera_theta2 -= 2* dt
-
-        
+        #Se actualiza el cursor para su comparación en el cilo siguiente
+        cursor_actual = cursor_at 
         
 
         ############################
@@ -563,17 +528,18 @@ if __name__ == "__main__":
         Ala_Izquierda5.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
    
 
-
+        ##Posición de los pájaros (x,y,z) según coordenadas de la curva del inicio
         camaraX=c[counter][0]
         camaraY=c[counter][1]
         camaraZ=c[counter][2]
 
 
-
+        ##Posición siguiente de los pájaros (x,y,z) según coordenadas de la curva del inicio
         posicion_siguienteX = c[counter+1][0]
         posicion_siguienteY = c[counter+1][1]
         posicion_siguienteZ = c[counter+1][2]
         
+        ##Obtención derivada entre ambos puntos
         if (posicion_siguienteX-camaraX)!=0:
             derivada = (posicion_siguienteY-camaraY) / (posicion_siguienteX-camaraX)
             if derivada>control.derivada:
@@ -581,8 +547,7 @@ if __name__ == "__main__":
             elif derivada<control.derivada:
                 control.derivada-=0.01
 
-        #angulo_pajaro=np.arctan(control.derivada)
-
+        ##Obtención del ángulo con arctan de la derivada
         if camaraX>posicion_siguienteX and camaraY<posicion_siguienteY:
             angulo_pajaro=np.arctan(control.derivada) - np.pi/2#no cambiar
         elif camaraX>posicion_siguienteX and camaraY > posicion_siguienteY:
@@ -592,67 +557,63 @@ if __name__ == "__main__":
         else:
             angulo_pajaro=np.arctan(control.derivada)+np.pi -np.pi/2
 
+        ##Traslación de los pájaros por los puntos de la curva
         Pajaro1.transform = tr.translate(camaraX,camaraY,camaraZ)
         Pajaro12.transform = tr.translate(camaraX+1,camaraY+1,camaraZ+1)
         Pajaro13.transform = tr.translate(camaraX+2,camaraY+2,camaraZ+2)
         Pajaro14.transform = tr.translate(camaraX+1,camaraY-1,camaraZ+1)
         Pajaro15.transform = tr.translate(camaraX+2,camaraY-2,camaraZ+2)
-        #Pajaro2.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(angulo_pajaro)])
        
 
         #################
         ##Rotación pájaros##
         #################
-        #Rotacion respecto a su eje
+
+        ##Rotacion respecto a su eje
         if angulo_pajaro>control.angulo_pajaro:
             control.angulo_pajaro+=0.01
         elif angulo_pajaro<control.angulo_pajaro:
             control.angulo_pajaro-=0.01
 
-        #Aplicar Rotaciones
+        ##Aplicar Rotaciones
         Pajaro2.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(control.angulo_pajaro)])
         Pajaro22.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(control.angulo_pajaro)])
         Pajaro23.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(control.angulo_pajaro)])
         Pajaro24.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(control.angulo_pajaro)])
         Pajaro25.transform = tr.matmul([tr.uniformScale(0.1),tr.rotationX(np.pi*(1/2)),tr.rotationY(control.angulo_pajaro)])
 
-        #angulo = 0 apunta a negro verde    0.1.  verde
-        #Angulo = pi/2  rojo
-        #print(camaraX,camaraY)
-        #print(angulo_pajaro)
 
-        
-        #-0.1   0.1
-        #1.2     -2.6
-        #---------
-        # 1.3     2.7
-        #0.00216         0.004500
+        ####################
+        ##Vectores de la cámara##
+        ####################
+        ##Radio
         R = 12
+
+        #Coordenadas esféricas
         camX = R * np.sin(camera_theta+3) * np.sin(camera_theta2-2)
         camY = R * np.cos(camera_theta+3) * np.sin(camera_theta2-2)
         camZ = R * np.cos(camera_theta2-2)
 
+        ##Vector up varía según dónde se observe
         headX = R * np.sin(camera_theta+3) * np.sin(camera_theta2-2+np.pi/2)
         headY = R * np.cos(camera_theta+3) * np.sin(camera_theta2-2+np.pi/2)
         headZ = R * np.cos(camera_theta2-2+np.pi/2)
         
         
-        if counter==len(c)-4:      #0.998995994995999 -1.000998997997999
+        ##Si se van a acabar los puntos, empezar de nuevo
+        if counter==len(c)-4:      
             counter=0
         counter+=1
 
-        viewPos2 = np.array([5, 5, 5])    
-        viewPos = np.array([camX+5, camY+5, camZ])
-
+        ##Actualizar vectores de cámara
+        viewPos2 = np.array([5, 5, 5])          #Posición cámara
+        viewPos = np.array([camX+5, camY+5, camZ])   #Eye cámara
 
         view = tr.lookAt(
             viewPos2,
-            #np.array([0,0,1]),
             viewPos,
-            #np.array([ 0,0,1])
             np.array([ headX,headY,headZ])
         )
-        #Dnd esta, hacia a donde ,para arriba
 
 
         # Setting up the projection transform
@@ -661,17 +622,14 @@ if __name__ == "__main__":
         # Clearing the screen in both, color and depth
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-        # Filling or not the shapes depending on the controller state
-        #if (controller.fillPolygon):
-        #    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-        #else:
-        #    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-
+        #Se elige el fondo
         if control.Fondo1:
             Fondo = Fondo1
         else:
             Fondo = Fondo2
 
+
+        # Drawing shapes
         glUseProgram(mvpTPipeline.shaderProgram)
         glUniformMatrix4fv(glGetUniformLocation(mvpTPipeline.shaderProgram, "projection"), 1, GL_TRUE, projection)
         glUniformMatrix4fv(glGetUniformLocation(mvpTPipeline.shaderProgram, "view"), 1, GL_TRUE, view)
@@ -679,7 +637,6 @@ if __name__ == "__main__":
         sg.drawSceneGraphNode(Fondo, mvpTPipeline, "model")
         
         
-        # Drawing shapes
         glUseProgram(pipeline.shaderProgram)
         glUniform3f(glGetUniformLocation(pipeline.shaderProgram, "La"), 1.0, 1.0, 1.0)
         glUniform3f(glGetUniformLocation(pipeline.shaderProgram, "Ld"), 1.0, 1.0, 1.0)
@@ -701,31 +658,12 @@ if __name__ == "__main__":
         glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE, tr.uniformScale(3))
 
 
-        ###
+        #Dibujado de los 5 pájaros
         sg.drawSceneGraphNode(pajarito, pipeline, "model")
         sg.drawSceneGraphNode(pajarito2, pipeline, "model")
         sg.drawSceneGraphNode(pajarito3, pipeline, "model")
         sg.drawSceneGraphNode(pajarito4, pipeline, "model")
         sg.drawSceneGraphNode(pajarito5, pipeline, "model")
-
-        #sg.drawSceneGraphNode(Fondo, pipeline, "model")
-        #pipeline.drawShape(gpuSuzanne)
-
-            ##
-        glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE,
-            tr.matmul([
-                tr.uniformScale(3),
-                tr.rotationX(np.pi/2),
-                tr.translate(1.5,-0.25,0)])
-        )
-        #pipeline.drawShape(gpuCarrot)
-        
-        glUseProgram(mvpPipeline.shaderProgram)
-        glUniformMatrix4fv(glGetUniformLocation(mvpPipeline.shaderProgram, "projection"), 1, GL_TRUE, projection)
-        glUniformMatrix4fv(glGetUniformLocation(mvpPipeline.shaderProgram, "view"), 1, GL_TRUE, view)
-        glUniformMatrix4fv(glGetUniformLocation(mvpPipeline.shaderProgram, "model"), 1, GL_TRUE, tr.identity())
-        #mvpPipeline.drawShape(gpuAxis, GL_LINES)
-
 
         # Once the drawing is rendered, buffers are swap so an uncomplete drawing is never seen.
         glfw.swap_buffers(window)
