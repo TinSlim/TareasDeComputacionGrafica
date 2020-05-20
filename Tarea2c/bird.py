@@ -217,8 +217,8 @@ if __name__ == "__main__":
 
         #Manejo de la cámara
         R = 13
-        camX = R * np.sin(camera_theta)
-        camY = R * np.cos(camera_theta)
+        camX = R * np.sin(camera_theta+3)
+        camY = R * np.cos(camera_theta+3)
         viewPos = np.array([camX, camY,3])
         view = tr.lookAt(
             viewPos,
