@@ -19,6 +19,7 @@
 
 
 - Uso
+
     bird)
 
     -Para mover las alas, mover el mouse entre los límites superior e inferior de la ventana.
