@@ -48,62 +48,147 @@ for z in range(nh):
             #+x
             elif (x==nw-1) and (1<=y and y<=nl-2) and (1<=z and z<=nh-2):
                 A[k, k_x] = 0
-                A[k, k_-x] = 1 
+                A[k, k_-x] = 2 
                 A[k, k_y] = 1
                 A[k, k_-y] = 1
                 A[k, k_z] = 1
                 A[k, k_-z] = 1
                 A[k,k] = -4
-                b[k] = 0
+                b[k] = -2*h*B
 
             #-x
-            elif (x=1) and (1<=y and y<=nl-2) and (1<=z and z<=nh-2):
-                A[k, k_x] =1
+            elif (x==0) and (1<=y and y<=nl-2) and (1<=z and z<=nh-2):
+                A[k, k_x] =2
                 A[k, k_-x] = 0
                 A[k, k_y] = 1
                 A[k, k_-y] = 1
                 A[k, k_z] = 1
                 A[k, k_-z] = 1
                 A[k,k] = -4
-                b[k] = 0
+                b[k] = -2*h*B
 
             #+y
             elif (1<=x and x<=nw -2) and (y==nl-1) and (1<=z and z<=nh-2):
                 A[k, k_x] = 1
                 A[k, k_-x] = 1 
                 A[k, k_y] = 0
-                A[k, k_-y] = 1
+                A[k, k_-y] = 2
                 A[k, k_z] = 1
                 A[k, k_-z] = 1
                 A[k,k] = -4
-                b[k] = 0
+                b[k] = -2*h*B
 
             #-y
-            elif (1<=x and x<=nw -2) and (y==1) and (1<=z and z<=nh-2):
+            elif (1<=x and x<=nw -2) and (y==0) and (1<=z and z<=nh-2):
                 A[k, k_x] = 1
                 A[k, k_-x] = 1 
-                A[k, k_y] = 1
+                A[k, k_y] = 2
                 A[k, k_-y] = 0
                 A[k, k_z] = 1
                 A[k, k_-z] = 1
                 A[k,k] = -4
-                b[k] = 0
+                b[k] = -2*h*B
 
-            #+z
+            #+z arreglar
             elif (1<=x and x<=nw -2) and (1<=y and y<=nl-2) and (z==nh-1):
                 A[k, k_x] = 1
                 A[k, k_-x] = 1 
                 A[k, k_y] = 1
                 A[k, k_-y] = 1
                 A[k, k_z] = 0
-                A[k, k_-z] = 1
+                A[k, k_-z] = 2
                 A[k,k] = -4
                 b[k] = 0
 
             #-z Agregar heater
-            elif (1<=x and x<=nw -2) and (1<=y and y<=nl-2) and (z==1):
+            elif (1<=x and x<=nw -2) and (1<=y and y<=nl-2) and (z==0):
                 A[k, k_x] = 1
                 A[k, k_-x] = 1 
+                A[k, k_y] = 1
+                A[k, k_-y] = 1
+                A[k, k_z] = 2
+                A[k, k_-z] = 0
+                A[k,k] = -4
+                b[k] = 0
+
+            ##2 paredes##
+            
+            elif (1<=x and x<=nw -2) and (y==nl-1) and (z==nh-1):
+                A[k, k_x] = 1
+                A[k, k_-x] = 1 
+                A[k, k_y] = 1
+                A[k, k_-y] = 2
+                A[k, k_z] = 0
+                A[k, k_-z] = 1
+                A[k,k] = -4
+                b[k] = -B -2*h*b
+            
+            elif (1<=x and x<=nw -2) and (y==0) and (z==nh-1):
+                A[k, k_x] = 1
+                A[k, k_-x] = 1 
+                A[k, k_y] = 2
+                A[k, k_-y] = 0
+                A[k, k_z] = 0
+                A[k, k_-z] = 1
+                A[k,k] = -4
+                b[k] = -B-2*h*b
+
+
+            elif (1<=x and x<=nw -2) and (y==nl-1) and (z==0):
+                A[k, k_x] = 1
+                A[k, k_-x] = 1 
+                A[k, k_y] = 0
+                A[k, k_-y] = 2
+                A[k, k_z] = 1
+                A[k, k_-z] = 0
+                A[k,k] = -4
+                b[k] = -B -2*h*b
+            
+            elif (1<=x and x<=nw -2) and (y==0) and (z==0):
+                A[k, k_x] = 1
+                A[k, k_-x] = 1 
+                A[k, k_y] = 2
+                A[k, k_-y] = 0
+                A[k, k_z] = 1
+                A[k, k_-z] = 0
+                A[k,k] = -4
+                b[k] = -B -2*h*b
+
+###########################
+            elif (x==nw -1) and (1<=y and y<=nl-2) and (z==nh-1):
+                A[k, k_x] = 0
+                A[k, k_-x] = 2 
+                A[k, k_y] = 1
+                A[k, k_-y] = 1
+                A[k, k_z] = 0
+                A[k, k_-z] = 1
+                A[k,k] = -4
+                b[k] = 0
+            
+            elif (x==0) and (1<=y and y<=nl-2) and (z==nh-1):
+                A[k, k_x] = 2
+                A[k, k_-x] = 0 
+                A[k, k_y] = 1
+                A[k, k_-y] = 1
+                A[k, k_z] = 0
+                A[k, k_-z] = 1
+                A[k,k] = -4
+                b[k] = 0          
+
+
+            elif (x==nw -1) and (1<=y and y<=nl-2) and (z==0):
+                A[k, k_x] = 0
+                A[k, k_-x] = 2 
+                A[k, k_y] = 1
+                A[k, k_-y] = 1
+                A[k, k_z] = 1
+                A[k, k_-z] = 0
+                A[k,k] = -4
+                b[k] = 0
+            
+            elif (x==0) and (1<=y and y<=nl-2) and (z==0):
+                A[k, k_x] = 2
+                A[k, k_-x] = 0 
                 A[k, k_y] = 1
                 A[k, k_-y] = 1
                 A[k, k_z] = 1
@@ -111,32 +196,135 @@ for z in range(nh):
                 A[k,k] = -4
                 b[k] = 0
 
-            #############################
-            elif (1<=x and x<=nw -2) and (y==nl-1) and (z==nh-1):
-            
-            elif (1<=x and x<=nw -2) and (y==1) and (z==nh-1):
+            ##############################
 
-            elif (x==nw -1) and (1<=y and y<=nl-2) and (z==nh-1):
-            
-            elif (x==1) and (1<=y and y<=nl-2) and (z==nh-1):
-            
-            ###########################
-
-            elif (1<=x and x<=nw -2) and (y==nl-1) and (z==1):
-            
-            elif (1<=x and x<=nw -2) and (y==1) and (z==1):
-
-            elif (x==nw -1) and (1<=y and y<=nl-2) and (z==1):
-            
-            elif (x==1) and (1<=y and y<=nl-2) and (z==1):
-
-            
             elif (x==nw -1) and (y==nl-1) and (1<=z and z<=nh-2):
+                A[k, k_x] =0
+                A[k, k_-x] = 2 
+                A[k, k_y] = 0
+                A[k, k_-y] = 2
+                A[k, k_z] = 1
+                A[k, k_-z] = 1
+                A[k,k] = -4
+                b[k] = 0  
 
-            elif (x==nw -1) and (y==1) and (1<=z and z<=nh-2):
+            elif (x==nw -1) and (y==0) and (1<=z and z<=nh-2):
+                A[k, k_x] =0
+                A[k, k_-x] = 2 
+                A[k, k_y] = 2
+                A[k, k_-y] = 0
+                A[k, k_z] = 1
+                A[k, k_-z] = 1
+                A[k,k] = -4
+                b[k] = 0  
 
-            elif (x==1) and (y==nl-1) and (1<=z and z<=nh-2):
+            elif (x==0) and (y==nl-1) and (1<=z and z<=nh-2):
+                A[k, k_x] =2
+                A[k, k_-x] = 0 
+                A[k, k_y] = 0
+                A[k, k_-y] = 2
+                A[k, k_z] = 1
+                A[k, k_-z] = 1
+                A[k,k] = -4
+                b[k] = 0  
 
-            elif (x==1) and (y==1) and (1<=z and z<=nh-2):
+            elif (x==0) and (y==0) and (1<=z and z<=nh-2):
+                A[k, k_x] =2
+                A[k, k_-x] = 0 
+                A[k, k_y] = 2
+                A[k, k_-y] = 0
+                A[k, k_z] = 1
+                A[k, k_-z] = 1
+                A[k,k] = -4
+                b[k] = 0  
+            
+
+
+
+
+            #3 paredes ##
+            if (x==0) and (y==0) and (z==0):
+                A[k, k_x] =2
+                A[k, k_-x] = 0 
+                A[k, k_y] = 2
+                A[k, k_-y] = 0
+                A[k, k_z] = 1
+                A[k, k_-z] = 0
+                A[k,k] = -4
+                b[k] = 0  
+
+            if (x==0) and (y==0) and (z==nh-1):
+                A[k, k_x] =2
+                A[k, k_-x] = 0 
+                A[k, k_y] = 2
+                A[k, k_-y] = 0
+                A[k, k_z] = 0
+                A[k, k_-z] = 1
+                A[k,k] = -4
+                b[k] = 0  
+
+
+            if (x==0) and (y==nl-1) and (z==0):
+                A[k, k_x] =2
+                A[k, k_-x] = 0 
+                A[k, k_y] = 0
+                A[k, k_-y] = 2
+                A[k, k_z] = 1
+                A[k, k_-z] = 0
+                A[k,k] = -4
+                b[k] = 0  
+
+            if (x==0) and (y==nl-1) and (z==nh-1):
+                A[k, k_x] =2
+                A[k, k_-x] = 0 
+                A[k, k_y] = 0
+                A[k, k_-y] = 2
+                A[k, k_z] = 0
+                A[k, k_-z] = 1
+                A[k,k] = -4
+                b[k] = 0  
+
             
             
+            if (x==nw -1) and (y==0) and (z==0):
+                A[k, k_x] =0
+                A[k, k_-x] = 2 
+                A[k, k_y] = 2
+                A[k, k_-y] = 0
+                A[k, k_z] = 1
+                A[k, k_-z] = 0
+                A[k,k] = -4
+                b[k] = 0  
+
+            if (x==nw -1) and (y==0) and (z==nh-1):
+                A[k, k_x] =0
+                A[k, k_-x] = 2 
+                A[k, k_y] = 2
+                A[k, k_-y] = 0
+                A[k, k_z] = 0
+                A[k, k_-z] = 1
+                A[k,k] = -4
+                b[k] = 0  
+
+
+            if (x==nw -1) and (y==nl-1) and (z==0):
+                A[k, k_x] =0
+                A[k, k_-x] = 2 
+                A[k, k_y] = 0
+                A[k, k_-y] = 2
+                A[k, k_z] = 1
+                A[k, k_-z] = 0
+                A[k,k] = -4
+                b[k] = 0  
+
+
+
+            if (x==nw -1) and (y==nl-1) and (z==nh-1):
+                A[k, k_x] =0
+                A[k, k_-x] = 2 
+                A[k, k_y] = 0
+                A[k, k_-y] = 2
+                A[k, k_z] = 0
+                A[k, k_-z] = 1
+                A[k,k] = -4
+                b[k] = 0  
