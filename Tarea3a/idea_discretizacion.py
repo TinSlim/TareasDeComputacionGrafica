@@ -25,6 +25,13 @@ def getK(x,y,z):
     return x+nw*y+z*nl*nw
 
 def getIJK(k):
+    W=3
+    L=3
+    H = 3
+    h = 1
+    nw = int(W/h) -1
+    nl = int(L/h) -1
+    nh = int(H/h) -1
     z = k//(nh*nw)
     y = (k%(nh*nw))//nw
     x = (k%(nh*nw))%nw
@@ -38,11 +45,11 @@ def matrix(W,L,H,h,C,B,header_a,header_b):
     A = np.zeros(((nw)*(nl)*(nw),(nw)*(nl)*(nw)))
     #A = np.zeros(((nw+1)*(nl+1)*(nw+1),(nw+1)*(nl+1)*(nw+1)))
     b = np.zeros (nw*nl*nw)
+    print( len(A),len(b))
 
     for z in range(nh):
         for y in range(nl):
             for x in range(nw):
-                print(x,y,z)
 
                 k = getK(x,y,z)
                 
@@ -66,7 +73,7 @@ def matrix(W,L,H,h,C,B,header_a,header_b):
                 ##########################
                 #+x
                 elif (x==nw-1) and (1<=y and y<=nl-2) and (1<=z and z<=nh-2):
-                    A[k, k_x] = 0
+                    #A[k, k_x] = 0
                     A[k, k__x] = 2 
                     A[k, k_y] = 1
                     A[k, k__y] = 1
@@ -78,7 +85,7 @@ def matrix(W,L,H,h,C,B,header_a,header_b):
                 #_x
                 elif (x==0) and (1<=y and y<=nl-2) and (1<=z and z<=nh-2):
                     A[k, k_x] =2
-                    A[k, k__x] = 0
+                    #A[k, k__x] = 0
                     A[k, k_y] = 1
                     A[k, k__y] = 1
                     A[k, k_z] = 1
@@ -90,7 +97,7 @@ def matrix(W,L,H,h,C,B,header_a,header_b):
                 elif (1<=x and x<=nw -2) and (y==nl-1) and (1<=z and z<=nh-2):
                     A[k, k_x] = 1
                     A[k, k__x] = 1 
-                    A[k, k_y] = 0
+                    #A[k, k_y] = 0
                     A[k, k__y] = 2
                     A[k, k_z] = 1
                     A[k, k__z] = 1
@@ -102,7 +109,7 @@ def matrix(W,L,H,h,C,B,header_a,header_b):
                     A[k, k_x] = 1
                     A[k, k__x] = 1 
                     A[k, k_y] = 2
-                    A[k, k__y] = 0
+                    #A[k, k__y] = 0
                     A[k, k_z] = 1
                     A[k, k__z] = 1
                     A[k,k] = -6
@@ -114,7 +121,7 @@ def matrix(W,L,H,h,C,B,header_a,header_b):
                     A[k, k__x] = 1 
                     A[k, k_y] = 1
                     A[k, k__y] = 1
-                    A[k, k_z] = 0
+                    #A[k, k_z] = 0
                     A[k, k__z] = 1
                     A[k,k] = -6
                     b[k] = - C
@@ -135,87 +142,87 @@ def matrix(W,L,H,h,C,B,header_a,header_b):
                     A[k, k_y] = 1
                     A[k, k__y] = 1
                     A[k, k_z] = 1
-                    A[k, k__z] = 0
+                    #A[k, k__z] = 0
                     A[k,k] = -6
                 ## if x or y 000 blabal
                         
                 #3 paredes ##
                 elif (x==0) and (y==0) and (z==0):
                     A[k, k_x] =2
-                    A[k, k__x] = 0 
+                    #A[k, k__x] = 0 
                     A[k, k_y] = 2
-                    A[k, k__y] = 0
+                    #A[k, k__y] = 0
                     A[k, k_z] = 1
-                    A[k, k__z] = 0
+                    #A[k, k__z] = 0
                     A[k,k] = -6
                     b[k] = -4*h*B  
 
                 elif (x==0) and (y==0) and (z==nh-1):
                     A[k, k_x] =2
-                    A[k, k__x] = 0 
+                    #A[k, k__x] = 0 
                     A[k, k_y] = 2
-                    A[k, k__y] = 0
-                    A[k, k_z] = 0
+                    #A[k, k__y] = 0
+                    #A[k, k_z] = 0
                     A[k, k__z] = 1
                     A[k,k] = -6
                     b[k] = -4*h*B - C
 
                 elif (x==0) and (y==nl-1) and (z==0):
                     A[k, k_x] =2
-                    A[k, k__x] = 0 
-                    A[k, k_y] = 0
+                    #A[k, k__x] = 0 
+                    #A[k, k_y] = 0
                     A[k, k__y] = 2
                     A[k, k_z] = 1
-                    A[k, k__z] = 0
+                    #A[k, k__z] = 0
                     A[k,k] = -6
                     b[k] = -4*h*B  
 
                 elif (x==0) and (y==nl-1) and (z==nh-1):
                     A[k, k_x] =2
-                    A[k, k__x] = 0 
-                    A[k, k_y] = 0
+                    #A[k, k__x] = 0 
+                    #A[k, k_y] = 0
                     A[k, k__y] = 2
-                    A[k, k_z] = 0
+                    #A[k, k_z] = 0
                     A[k, k__z] = 1
                     A[k,k] = -6
                     b[k] = -4*h*B - C  
              
                 elif (x==nw -1) and (y==0) and (z==0):
-                    A[k, k_x] =0
+                    #A[k, k_x] =0
                     A[k, k__x] = 2 
                     A[k, k_y] = 2
-                    A[k, k__y] = 0
+                    #A[k, k__y] = 0
                     A[k, k_z] = 1
-                    A[k, k__z] = 0
+                    #A[k, k__z] = 0
                     A[k,k] = -6
                     b[k] = -4*h*B
 
                 elif (x==nw -1) and (y==0) and (z==nh-1):
-                    A[k, k_x] =0
+                    #A[k, k_x] =0
                     A[k, k__x] = 2 
                     A[k, k_y] = 2
-                    A[k, k__y] = 0
-                    A[k, k_z] = 0
+                    #A[k, k__y] = 0
+                    #A[k, k_z] = 0
                     A[k, k__z] = 1
                     A[k,k] = -6
                     b[k] = -4*h*B - C  
 
                 elif (x==nw -1) and (y==nl-1) and (z==0):
-                    A[k, k_x] =0
+                    #A[k, k_x] =0
                     A[k, k__x] = 2 
-                    A[k, k_y] = 0
+                    #A[k, k_y] = 0
                     A[k, k__y] = 2
                     A[k, k_z] = 1
-                    A[k, k__z] = 0
+                    #A[k, k__z] = 0
                     A[k,k] = -6
                     b[k] = -4*h*B
 
                 elif (x==nw -1) and (y==nl-1) and (z==nh-1):
-                    A[k, k_x] =0
+                    #A[k, k_x] =0
                     A[k, k__x] = 2 
-                    A[k, k_y] = 0
+                    #A[k, k_y] = 0
                     A[k, k__y] = 2
-                    A[k, k_z] = 0
+                    #A[k, k_z] = 0
                     A[k, k__z] = 1
                     A[k,k] = -6
                     b[k] = -4*h*B - C  
@@ -227,9 +234,9 @@ def matrix(W,L,H,h,C,B,header_a,header_b):
                 elif (1<=x and x<=nw -2) and (y==nl-1) and (z==nh-1):
                     A[k, k_x] = 1
                     A[k, k__x] = 1 
-                    A[k, k_y] = 0
+                    #A[k, k_y] = 0
                     A[k, k__y] = 2
-                    A[k, k_z] = 0
+                    #A[k, k_z] = 0
                     A[k, k__z] = 1
                     A[k,k] = -6
                     b[k] = -C -2*h*B
@@ -238,8 +245,8 @@ def matrix(W,L,H,h,C,B,header_a,header_b):
                     A[k, k_x] = 1
                     A[k, k__x] = 1 
                     A[k, k_y] = 2
-                    A[k, k__y] = 0
-                    A[k, k_z] = 0
+                    #A[k, k__y] = 0
+                    #A[k, k_z] = 0
                     A[k, k__z] = 1
                     A[k,k] = -6
                     b[k] = -C-2*h*B
@@ -247,10 +254,10 @@ def matrix(W,L,H,h,C,B,header_a,header_b):
                 elif (1<=x and x<=nw -2) and (y==nl-1) and (z==0):
                     A[k, k_x] = 1
                     A[k, k__x] = 1 
-                    A[k, k_y] = 0
+                    #A[k, k_y] = 0
                     A[k, k__y] = 2
                     A[k, k_z] = 1
-                    A[k, k__z] = 0
+                    #A[k, k__z] = 0
                     A[k,k] = -6
                     b[k] = -2*h*B
                 
@@ -258,59 +265,59 @@ def matrix(W,L,H,h,C,B,header_a,header_b):
                     A[k, k_x] = 1
                     A[k, k__x] = 1 
                     A[k, k_y] = 2
-                    A[k, k__y] = 0
+                    #A[k, k__y] = 0
                     A[k, k_z] = 1
-                    A[k, k__z] = 0
+                    #A[k, k__z] = 0
                     A[k,k] = -6
                     b[k] = -2*h*B
 
                 ###########################
                 elif (x==nw -1) and (1<=y and y<=nl-2) and (z==nh-1):
-                    A[k, k_x] = 0
+                    #A[k, k_x] = 0
                     A[k, k__x] = 2 
                     A[k, k_y] = 1
                     A[k, k__y] = 1
-                    A[k, k_z] = 0
+                    #A[k, k_z] = 0
                     A[k, k__z] = 1
                     A[k,k] = -6
                     b[k] = -2*h*B -C
                 
                 elif (x==0) and (1<=y and y<=nl-2) and (z==nh-1):
                     A[k, k_x] = 2
-                    A[k, k__x] = 0 
+                    #A[k, k__x] = 0 
                     A[k, k_y] = 1
                     A[k, k__y] = 1
-                    A[k, k_z] = 0
+                    #A[k, k_z] = 0
                     A[k, k__z] = 1
                     A[k,k] = -6
                     b[k] = -2*h*B -C          
 
 
                 elif (x==nw -1) and (1<=y and y<=nl-2) and (z==0):
-                    A[k, k_x] = 0
+                    #A[k, k_x] = 0
                     A[k, k__x] = 2 
                     A[k, k_y] = 1
                     A[k, k__y] = 1
                     A[k, k_z] = 1
-                    A[k, k__z] = 0
+                    #A[k, k__z] = 0
                     A[k,k] = -6
                     b[k] = -2*h*B 
                 
                 elif (x==0) and (1<=y and y<=nl-2) and (z==0):
                     A[k, k_x] = 2
-                    A[k, k__x] = 0 
+                    #A[k, k__x] = 0 
                     A[k, k_y] = 1
                     A[k, k__y] = 1
                     A[k, k_z] = 1
-                    A[k, k__z] = 0
+                    #A[k, k__z] = 0
                     A[k,k] = -6
                     b[k] = -2*h*B
                 ##############################
 
                 elif (x==nw -1) and (y==nl-1) and (1<=z and z<=nh-2):
-                    A[k, k_x] =0
+                    #A[k, k_x] =0
                     A[k, k__x] = 2 
-                    A[k, k_y] = 0
+                    #A[k, k_y] = 0
                     A[k, k__y] = 2
                     A[k, k_z] = 1
                     A[k, k__z] = 1
@@ -318,10 +325,10 @@ def matrix(W,L,H,h,C,B,header_a,header_b):
                     b[k] = -4*h*B
 
                 elif (x==nw -1) and (y==0) and (1<=z and z<=nh-2):
-                    A[k, k_x] =0
+                    #A[k, k_x] =0
                     A[k, k__x] = 2 
                     A[k, k_y] = 2
-                    A[k, k__y] = 0
+                    #A[k, k__y] = 0
                     A[k, k_z] = 1
                     A[k, k__z] = 1
                     A[k,k] = -6
@@ -329,8 +336,8 @@ def matrix(W,L,H,h,C,B,header_a,header_b):
 
                 elif (x==0) and (y==nl-1) and (1<=z and z<=nh-2):
                     A[k, k_x] =2
-                    A[k, k__x] = 0 
-                    A[k, k_y] = 0
+                    #A[k, k__x] = 0 
+                    #A[k, k_y] = 0
                     A[k, k__y] = 2
                     A[k, k_z] = 1
                     A[k, k__z] = 1
@@ -339,9 +346,9 @@ def matrix(W,L,H,h,C,B,header_a,header_b):
 
                 elif (x==0) and (y==0) and (1<=z and z<=nh-2):
                     A[k, k_x] =2
-                    A[k, k__x] = 0 
+                    #A[k, k__x] = 0 
                     A[k, k_y] = 2
-                    A[k, k__y] = 0
+                    #A[k, k__y] = 0
                     A[k, k_z] = 1
                     A[k, k__z] = 1
                     A[k,k] = -6
@@ -354,4 +361,15 @@ def solveMatrix(A,b):
     return np.linalg.solve(A,b)
 
 matriz_resuelta = matrix(3,3,3,1,1,2,20,20)
-#solveMatrix(matriz_resuelta[0],matriz_resuelta[1])
+vector_resuelto = solveMatrix(matriz_resuelta[0],matriz_resuelta[1])
+print(vector_resuelto)
+
+Matriz_ultima = np.zeros( (getIJK(len(vector_resuelto)-1)[0] +1,getIJK(len(vector_resuelto)-1)[1] +1 ,getIJK(len(vector_resuelto)-1)[2] +1 ) )
+print(Matriz_ultima)
+
+indice = 0
+for numero in vector_resuelto:
+    coordenada = getIJK(indice)
+    Matriz_ultima[coordenada] = numero
+    indice+=1
+print(Matriz_ultima)
