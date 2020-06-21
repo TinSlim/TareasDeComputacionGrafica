@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 
 W = 4  #X
@@ -14,21 +16,13 @@ nl = int(L/h) -1
 nh = int(H/h) -1
 
 
-def getK(x,y,z):
-    W=3
-    L=3
-    H = 3
-    h = 1
+def getK(x,y,z,W,L,H,h):
     nw = int(W/h) -1
     nl = int(L/h) -1
     nh = int(H/h) -1
     return x+nw*y+z*nl*nw
 
-def getIJK(k):
-    W=3
-    L=3
-    H = 3
-    h = 1
+def getIJK(k,W,L,H,h):
     nw = int(W/h) -1
     nl = int(L/h) -1
     nh = int(H/h) -1
@@ -37,28 +31,35 @@ def getIJK(k):
     x = (k%(nh*nw))%nw
     return (x,y,z)
 
+
+def solveMatrix(A,b):
+    return np.linalg.solve(A,b)
+
+
 def matrix(W,L,H,h,C,B,header_a,header_b):
     nw = int(W/h) -1 #x
     nl = int(L/h) -1    #y
     nh = int(H/h) -1  #z
+    print('ns',nw,nl,nh,(nw)*(nl)*(nh))
 
-    A = np.zeros(((nw)*(nl)*(nw),(nw)*(nl)*(nw)))
+    A = np.zeros(((nw)*(nl)*(nh),(nw)*(nl)*(nh)))
     #A = np.zeros(((nw+1)*(nl+1)*(nw+1),(nw+1)*(nl+1)*(nw+1)))
-    b = np.zeros (nw*nl*nw)
-    print( len(A),len(b))
+    b = np.zeros (nw*nl*nh)
+    #b = np.zeros ((nw+1)*(nl+1)*(nw+1))
+    print( len(A),len(b),'lens')
 
     for z in range(nh):
         for y in range(nl):
             for x in range(nw):
 
-                k = getK(x,y,z)
+                k = getK(x,y,z,W,L,H,h)
                 
-                k_x = getK(x+1,y,z)
-                k__x = getK(x-1,y,z)
-                k_y = getK(x,y+1,z)
-                k__y = getK(x,y-1,z)
-                k_z = getK(x,y,z+1)
-                k__z = getK(x,y,z-1)
+                k_x = getK(x+1,y,z,W,L,H,h)
+                k__x = getK(x-1,y,z,W,L,H,h)
+                k_y = getK(x,y+1,z,W,L,H,h)
+                k__y = getK(x,y-1,z,W,L,H,h)
+                k_z = getK(x,y,z+1,W,L,H,h)
+                k__z = getK(x,y,z-1,W,L,H,h)
                 #centro
                 if (1<=x and x<=nw -2) and (1<=y and y<=nl-2) and (1<=z and z<=nh-2):
                     A[k, k_x] = 1
@@ -354,22 +355,29 @@ def matrix(W,L,H,h,C,B,header_a,header_b):
                     A[k,k] = -6
                     b[k] = -4*h*B 
 
-    return (A,b)            
-                
+    
+    vector_resuelto = solveMatrix(A,b)
+    tamanio = getIJK(len(vector_resuelto)-1,W,L,H,h)
+    Matriz_ultima = np.zeros( (tamanio[0] +1,tamanio[1] +1 ,tamanio[2]+1) )
+    indice = 0
+    for numero in vector_resuelto:
+        coordenada = getIJK(indice,W,L,H,h)
+        Matriz_ultima[coordenada] = numero
+        indice+=1
+    
+    return Matriz_ultima
 
-def solveMatrix(A,b):
-    return np.linalg.solve(A,b)
 
-matriz_resuelta = matrix(3,3,3,1,1,2,20,20)
-vector_resuelto = solveMatrix(matriz_resuelta[0],matriz_resuelta[1])
-print(vector_resuelto)
 
-Matriz_ultima = np.zeros( (getIJK(len(vector_resuelto)-1)[0] +1,getIJK(len(vector_resuelto)-1)[1] +1 ,getIJK(len(vector_resuelto)-1)[2] +1 ) )
-print(Matriz_ultima)
+matriz_resuelta = matrix(4,3,5,1,1,2,20,20)
+# 3 6 4    4 6
+#vector_resuelto = solveMatrix(matriz_resuelta[0],matriz_resuelta[1])
+#print(vector_resuelto)
 
-indice = 0
-for numero in vector_resuelto:
-    coordenada = getIJK(indice)
-    Matriz_ultima[coordenada] = numero
-    indice+=1
-print(Matriz_ultima)
+
+print(matriz_resuelta)
+
+
+
+
+
