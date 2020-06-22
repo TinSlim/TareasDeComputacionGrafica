@@ -1,48 +1,119 @@
-"""Cristóbal Torres Gutiérrez"""
-
-
-##Bibliotecas
 import glfw
-from glfw.GLFW import *
-
 from OpenGL.GL import *
 import OpenGL.GL.shaders
 import numpy as np
 import sys
 
-##Módulos
 import Modulo.transformations as tr
-import Modulo.basic_shapes as bs
-import Modulo.scene_graph as sg
 import Modulo.easy_shaders as es
-import Modulo.readobj as rbj
-import Modulo.lighting_shaders as ls
-
-import Modulo.csvtolist_nuevo as cv
-import Modulo.curvas as crv
+import Modulo.basic_shapes as bs
+import Modulo.basic_shapes as bs
 
 
-##Recibe entrada del usuario, en caso de no haber usa un camino predeterminado
-try:
-    archivo_csv=str(sys.argv[1])
-except:
-    archivo_csv="path.csv"
+def createColorCube(i, j, k, X, Y, Z,c):
+    l_x = X[i, j, k]
+    r_x = X[i+1, j, k]
+    b_y = Y[i, j, k]
+    f_y = Y[i, j+1, k]
+    b_z = Z[i, j, k]
+    t_z = Z[i, j, k+1]
+    #c = np.random.rand
+    #   positions    colors
+    vertices = [
+    # Z+: number 1
+        l_x, b_y,  t_z, c,0,1-c,
+         r_x, b_y,  t_z, c,0,1-c,
+         r_x,  f_y,  t_z, c,0,1-c,
+        l_x,  f_y,  t_z, c,0,1-c,
+    # Z-: number 6
+        l_x, b_y, b_z, c,0,1-c,
+         r_x, b_y, b_z, c,0,1-c,
+         r_x,  f_y, b_z, c,0,1-c,
+        l_x,  f_y, b_z, c,0,1-c,
+    # X+: number 5
+         r_x, b_y, b_z, c,0,1-c,
+         r_x,  f_y, b_z, c,0,1-c,
+         r_x,  f_y,  t_z, c,0,1-c,
+         r_x, b_y,  t_z, c,0,1-c,
+    # X-: number 2
+        l_x, b_y, b_z, c,0,1-c,
+        l_x,  f_y, b_z, c,0,1-c,
+        l_x,  f_y,  t_z, c,0,1-c,
+        l_x, b_y,  t_z, c,0,1-c,
+    # Y+: number 4
+        l_x,  f_y, b_z, c,0,1-c,
+        r_x,  f_y, b_z, c,0,1-c,
+        r_x,  f_y, t_z, c,0,1-c,
+        l_x,  f_y, t_z, c,0,1-c,
+    # Y-: number 3
+        l_x, b_y, b_z, c,0,1-c,
+        r_x, b_y, b_z, c,0,1-c,
+        r_x, b_y, t_z, c,0,1-c,
+        l_x, b_y, t_z, c,0,1-c,
+        ]
+
+    # Defining connections among vertices
+    # We have a triangle every 3 indices specified
+    indices = [
+        0, 1, 2, 2, 3, 0,
+        4, 5, 6, 6, 7, 4,
+        4, 5, 1, 1, 0, 4,
+        6, 7, 3, 3, 2, 6,
+        5, 6, 2, 2, 1, 5,
+        7, 4, 0, 0, 3, 7]
+
+    return bs.Shape(vertices, indices)
+
+
+def merge(destinationShape, strideSize, sourceShape):
+
+    # current vertices are an offset for indices refering to vertices of the new shape
+    offset = len(destinationShape.vertices)
+    destinationShape.vertices += sourceShape.vertices
+    destinationShape.indices += [(offset/strideSize) + index for index in sourceShape.indices]
+
+
+PROJECTION_ORTHOGRAPHIC = 0
+PROJECTION_FRUSTUM = 1
+PROJECTION_PERSPECTIVE = 2
 
 
 
-##Se trabajan los puntos del archivo csv
+# A class to store the application control
+class Controller:
+    def __init__(self):
+        self.fillPolygon = True
+        self.projection = PROJECTION_ORTHOGRAPHIC
 
 
-##Botones, barra espaciadora permite cambiar la escena, Esc permite salir del programa
+# We will use the global controller as communication with the callback function
+controller = Controller()
+
+
 def on_key(window, key, scancode, action, mods):
+
     if action != glfw.PRESS:
         return
+    
+    global controller
 
     if key == glfw.KEY_SPACE:
-        control.Fondo1 = not control.Fondo1
+        controller.fillPolygon = not controller.fillPolygon
+
+    elif key == glfw.KEY_1:
+        print('Orthographic projection')
+        controller.projection = PROJECTION_ORTHOGRAPHIC
+
+    elif key == glfw.KEY_2:
+        print('Frustum projection')
+        controller.projection = PROJECTION_FRUSTUM
+
+    elif key == glfw.KEY_3:
+        print('Perspective projection')
+        controller.projection = PROJECTION_PERSPECTIVE
 
     elif key == glfw.KEY_ESCAPE:
-        sys.exit()
+        glfw.set_window_should_close(window, True)
 
 
 
@@ -52,12 +123,10 @@ if __name__ == "__main__":
     if not glfw.init():
         sys.exit()
 
-    ##Tamaño ventana
     width = 600
     height = 600
-    
-    window = glfw.create_window(width, height, "Aquarium", None, None)
-    glfw.set_input_mode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
+
+    window = glfw.create_window(width, height, "Projections Demo", None, None)
 
     if not window:
         glfw.terminate()
@@ -68,20 +137,14 @@ if __name__ == "__main__":
     # Connecting the callback function 'on_key' to handle keyboard events
     glfw.set_key_callback(window, on_key)
 
-    #Transparency
-    glEnable(GL_BLEND)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-
-    # Defining shader programs
-    pipeline = ls.SimplePhongShaderProgram()
-    mvpTPipeline = es.SimpleTextureModelViewProjectionShaderProgram()
+    # Assembling the shader program
+    pipeline = es.SimpleModelViewProjectionShaderProgram()
 
     # Telling OpenGL to use our shader program
     glUseProgram(pipeline.shaderProgram)
 
     # Setting up the clear screen color
-    #glClearColor(0.85, 0.85, 0.85, 1.0)
-    glClearColor(19/255, 175/255, 1, 1.0)
+    glClearColor(0.15, 0.15, 0.15, 1.0)
 
     # As we work in 3D, we need to check which part is in front,
     # and which one is at the back
@@ -89,99 +152,93 @@ if __name__ == "__main__":
 
     # Creating shapes on GPU memory
     gpuAxis = es.toGPUShape(bs.createAxis(7))
+    
+    # Load potentials and grid
+    load_voxels = np.load('solution.npy')
+    #X, Y, Z = np.mgrid[-2:2:20j, -2:2:20j, -2:2:20j]
+    X, Y, Z = np.mgrid[0:2:8j, 0:2.5:10j, 0:1.5:6j]
+    print(load_voxels.shape)
+    print(range(X.shape[0]-1),range(X.shape[1]-1),range(X.shape[2]-1))
 
-    #Variables iniciales
-    rotacion_pajaro=0
+    isosurface = bs.Shape([], [])
+    # Now let's draw voxels!
+    for i in range(X.shape[0]-1):
+        for j in range(X.shape[1]-1):
+            for k in range(X.shape[2]-1):
+                if load_voxels[i,j,k]:
+                    temp_shape = createColorCube(i,j,k, X,Y, Z,load_voxels[i,j,k]/20)
+                    merge(destinationShape=isosurface, strideSize=6, sourceShape=temp_shape)
+
+    gpu_surface = es.toGPUShape(isosurface)
 
     t0 = glfw.get_time()
-    camera_theta = -3*np.pi/4
-    camera_theta2 = 0
+    camera_theta = np.pi/4
 
     while not glfw.window_should_close(window):
         # Using GLFW to check for input events
         glfw.poll_events()
-
-        
 
         # Getting the time difference from the previous iteration
         t1 = glfw.get_time()
         dt = t1 - t0
         t0 = t1
 
+        if (glfw.get_key(window, glfw.KEY_LEFT) == glfw.PRESS):
+            camera_theta -= 2 * dt
 
-        ####################
-        ##Vectores de la cámara##
-        ####################
-        ##Radio
-        R = 12
+        if (glfw.get_key(window, glfw.KEY_RIGHT) == glfw.PRESS):
+            camera_theta += 2* dt
 
-        #Coordenadas esféricas
-        camX = R * np.sin(camera_theta+3) * np.sin(camera_theta2-2)
-        camY = R * np.cos(camera_theta+3) * np.sin(camera_theta2-2)
-        camZ = R * np.cos(camera_theta2-2)
+        # Setting up the view transform
 
-        ##Vector up varía según dónde se observe
-        headX = R * np.sin(camera_theta+3) * np.sin(camera_theta2-2+np.pi/2)
-        headY = R * np.cos(camera_theta+3) * np.sin(camera_theta2-2+np.pi/2)
-        headZ = R * np.cos(camera_theta2-2+np.pi/2)
-        
-        
+        camX = 10 * np.sin(camera_theta)
+        camY = 10 * np.cos(camera_theta)
 
-
-        ##Actualizar vectores de cámara
-        viewPos2 = np.array([5, 5, 5])          #Posición cámara
-        viewPos = np.array([camX+5, camY+5, camZ])   #Eye cámara
+        viewPos = np.array([camX, camY, 10])
 
         view = tr.lookAt(
-            viewPos2,
             viewPos,
-            np.array([ headX,headY,headZ])
+            np.array([0,0,0]),
+            np.array([0,0,1])
         )
 
+        glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "view"), 1, GL_TRUE, view)
 
         # Setting up the projection transform
-        projection = tr.perspective(60, float(width)/float(height), 0.001, 500)
+
+        if controller.projection == PROJECTION_ORTHOGRAPHIC:
+            projection = tr.ortho(-8, 8, -8, 8, 0.1, 100)
+
+        elif controller.projection == PROJECTION_FRUSTUM:
+            projection = tr.frustum(-5, 5, -5, 5, 9, 100)
+
+        elif controller.projection == PROJECTION_PERSPECTIVE:
+            projection = tr.perspective(60, float(width)/float(height), 0.1, 100)
+        
+        else:
+            raise Exception()
+
+        glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "projection"), 1, GL_TRUE, projection)
+
 
         # Clearing the screen in both, color and depth
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
+        # Filling or not the shapes depending on the controller state
+        if (controller.fillPolygon):
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+        else:
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+
+        # Drawing shapes with different model transformations
+        glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE, tr.translate(5,0,0))
+
         
-
-        # Drawing shapes
-        glUseProgram(mvpTPipeline.shaderProgram)
-        glUniformMatrix4fv(glGetUniformLocation(mvpTPipeline.shaderProgram, "projection"), 1, GL_TRUE, projection)
-        glUniformMatrix4fv(glGetUniformLocation(mvpTPipeline.shaderProgram, "view"), 1, GL_TRUE, view)
-        glUniformMatrix4fv(glGetUniformLocation(mvpTPipeline.shaderProgram, "model"), 1, GL_TRUE, tr.identity())
-        #sg.drawSceneGraphNode(Fondo, mvpTPipeline, "model")
-        
-        
-        glUseProgram(pipeline.shaderProgram)
-        glUniform3f(glGetUniformLocation(pipeline.shaderProgram, "La"), 1.0, 1.0, 1.0)
-        glUniform3f(glGetUniformLocation(pipeline.shaderProgram, "Ld"), 1.0, 1.0, 1.0)
-        glUniform3f(glGetUniformLocation(pipeline.shaderProgram, "Ls"), 1.0, 1.0, 1.0)
-
-        glUniform3f(glGetUniformLocation(pipeline.shaderProgram, "Ka"), 0.2, 0.2, 0.2)
-        glUniform3f(glGetUniformLocation(pipeline.shaderProgram, "Kd"), 0.9, 0.9, 0.9)
-        glUniform3f(glGetUniformLocation(pipeline.shaderProgram, "Ks"), 1.0, 1.0, 1.0)
-
-        glUniform3f(glGetUniformLocation(pipeline.shaderProgram, "lightPosition"), -3, 0, 3)
-        glUniform3f(glGetUniformLocation(pipeline.shaderProgram, "viewPosition"), viewPos[0], viewPos[1], viewPos[2])
-        glUniform1ui(glGetUniformLocation(pipeline.shaderProgram, "shininess"), 100)
-        glUniform1f(glGetUniformLocation(pipeline.shaderProgram, "constantAttenuation"), 0.001)
-        glUniform1f(glGetUniformLocation(pipeline.shaderProgram, "linearAttenuation"), 0.1)
-        glUniform1f(glGetUniformLocation(pipeline.shaderProgram, "quadraticAttenuation"), 0.01)
-
-        glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "projection"), 1, GL_TRUE, projection)
-        glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "view"), 1, GL_TRUE, view)
         glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE, tr.uniformScale(3))
-
-
-        #Dibujado de los 5 pájaros
-        #sg.drawSceneGraphNode(pajarito, pipeline, "model")
-        
+        pipeline.drawShape(gpuAxis, GL_LINES)
+        pipeline.drawShape(gpu_surface)
 
         # Once the drawing is rendered, buffers are swap so an uncomplete drawing is never seen.
         glfw.swap_buffers(window)
 
     glfw.terminate()
-
