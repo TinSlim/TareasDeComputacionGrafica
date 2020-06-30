@@ -64,7 +64,7 @@ def createColorCubeAleta(i, j, k, X, Y, Z,c):
         5, 6, 2, 2, 1, 5,
         7, 4, 0, 0, 3, 7]
 
-    return bs.Shape(vertices, indices)
+    return (bs.Shape(vertices, indices),l_x, b_y+0.05, t_z-0.05) #LX -0.05
 
 
 
@@ -129,12 +129,15 @@ def createPez(lista_coord, F, G, H,c,n):
     lista = lista_coord
     random.shuffle(lista)
     pez = n
+    aleta_pos = []
     while n >0:
         nuevo = lista.pop()
-        peces.append(es.toGPUShape(createColorCubeAleta(nuevo[0], nuevo[1], nuevo[2], F, G, H,1)))
+        aleta = createColorCubeAleta(nuevo[0], nuevo[1], nuevo[2], F, G, H,1)
+        aleta_pos.append([aleta[1],aleta[2],aleta[3]])
+        peces.append(es.toGPUShape(aleta[0]))
         peces.append(es.toGPUShape(createColorCube(nuevo[0], nuevo[1], nuevo[2], F, G, H,1)))
         n-=1
-    return peces
+    return peces,aleta_pos
     
 
 t_a = 15
@@ -285,7 +288,7 @@ if __name__ == "__main__":
     coordenadas_t_b = []
     coordenadas_t_c = []
     
-
+    
 
     for i in range(X.shape[0]-1):
         for j in range(X.shape[1]-1):
@@ -318,6 +321,8 @@ if __name__ == "__main__":
     camera_theta = np.pi/4
     camera_theta2 = 0
 
+    angulo_aleta = 0
+    ang_der = True
     while not glfw.window_should_close(window):
         # Using GLFW to check for input events
         glfw.poll_events()
@@ -326,6 +331,15 @@ if __name__ == "__main__":
         t1 = glfw.get_time()
         dt = t1 - t0
         t0 = t1
+        print(angulo_aleta)
+        if ang_der:
+            angulo_aleta+=0.05
+            if angulo_aleta>=1.0:
+                ang_der = not ang_der
+        else:
+            angulo_aleta-=0.05
+            if angulo_aleta<=-1.0:
+                ang_der = not ang_der
 
         if (glfw.get_key(window, glfw.KEY_LEFT) == glfw.PRESS):
             camera_theta -= 2 * dt
@@ -390,27 +404,32 @@ if __name__ == "__main__":
         pipeline.drawShape(gpuAxis, GL_LINES)
 
         x=0
-        for p in shapePezA:
+        for p in shapePezA[0]:
             if x%2==0:
-                glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE, tr.uniformScale(10))
+                posicion_ale = [shapePezA[1][x//2][0],shapePezA[1][x//2][1],shapePezA[1][x//2][2]]
+                glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE,tr.matmul([ tr.uniformScale(3),tr.translate(posicion_ale[0],posicion_ale[1],posicion_ale[2]),tr.rotationZ(angulo_aleta),tr.translate(-posicion_ale[0],-posicion_ale[1],-posicion_ale[2])]))
                 pipeline.drawShape(p)
             else:
                 glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE, tr.uniformScale(3))
                 pipeline.drawShape(p)
             x+=1
+
         x=0
-        for p in shapePezB:
+        for p in shapePezB[0]:
             if x%2==0:
-                glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE, tr.uniformScale(10))
+                posicion_ale = [shapePezB[1][x//2][0],shapePezB[1][x//2][1],shapePezB[1][x//2][2]]
+                glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE,tr.matmul([ tr.uniformScale(3),tr.translate(posicion_ale[0],posicion_ale[1],posicion_ale[2]),tr.rotationZ(angulo_aleta),tr.translate(-posicion_ale[0],-posicion_ale[1],-posicion_ale[2])]))
                 pipeline.drawShape(p)
             else:
                 glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE, tr.uniformScale(3))
                 pipeline.drawShape(p)
             x+=1
+
         x=0
-        for p in shapePezC:
+        for p in shapePezC[0]:
             if x%2==0:
-                glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE, tr.uniformScale(10))
+                posicion_ale = [shapePezC[1][x//2][0],shapePezC[1][x//2][1],shapePezC[1][x//2][2]]
+                glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE,tr.matmul([ tr.uniformScale(3),tr.translate(posicion_ale[0],posicion_ale[1],posicion_ale[2]),tr.rotationZ(angulo_aleta),tr.translate(-posicion_ale[0],-posicion_ale[1],-posicion_ale[2])]))
                 pipeline.drawShape(p)
             else:
                 glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE, tr.uniformScale(3))
