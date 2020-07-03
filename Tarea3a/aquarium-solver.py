@@ -156,23 +156,35 @@ if __name__ == "__main__":
     # Load potentials and grid
     load_voxels = np.load('solution.npy')
     #X, Y, Z = np.mgrid[-2:2:20j, -2:2:20j, -2:2:20j]
-    X, Y, Z = np.mgrid[0:2:8j, 0:2.5:10j, 0:1.5:6j]
+    #X, Y, Z = np.mgrid[0:2:8j, 0:2.5:10j, 0:1.5:6j]
+
+
+    #X, Y, Z = np.mgrid[0:2:20j, 0:2.5:25j, 0:1.5:15j]
+    #matriz_resuelta = matrix(4,3,5,1,25,0.1,25,30,"solution")
+    #X, Y, Z = np.mgrid[0:2:8, 0:2:8j, 0:2:8j]
+    #X, Y, Z = np.mgrid[0:4:20j, 0:5:25j, 0:3:15j]
+    X, Y, Z = np.mgrid[-1:1:16j, -1:1:20j, -1:1:12j]
+    #X, Y, Z = np.mgrid[0:2:8j, 0:2.5:10j, 0:1.5:6j]
     print(load_voxels.shape)
     print(range(X.shape[0]-1),range(X.shape[1]-1),range(X.shape[2]-1))
 
     isosurface = bs.Shape([], [])
+    
     # Now let's draw voxels!
     for i in range(X.shape[0]-1):
         for j in range(X.shape[1]-1):
             for k in range(X.shape[2]-1):
                 if load_voxels[i,j,k]:
-                    temp_shape = createColorCube(i,j,k, X,Y, Z,load_voxels[i,j,k]/20)
+                    temp_shape = createColorCube(i,j,k, X,Y, Z,load_voxels[i,j,k]/30)
                     merge(destinationShape=isosurface, strideSize=6, sourceShape=temp_shape)
+
 
     gpu_surface = es.toGPUShape(isosurface)
 
+
     t0 = glfw.get_time()
     camera_theta = np.pi/4
+    camera_theta2 = 0
 
     while not glfw.window_should_close(window):
         # Using GLFW to check for input events
@@ -189,12 +201,20 @@ if __name__ == "__main__":
         if (glfw.get_key(window, glfw.KEY_RIGHT) == glfw.PRESS):
             camera_theta += 2* dt
 
+        if (glfw.get_key(window, glfw.KEY_DOWN) == glfw.PRESS):
+            camera_theta2 += 2*dt
+
+        if (glfw.get_key(window, glfw.KEY_UP) == glfw.PRESS):
+            camera_theta2 -= 2*dt
+
         # Setting up the view transform
 
-        camX = 10 * np.sin(camera_theta)
-        camY = 10 * np.cos(camera_theta)
+        camX = 10 * np.sin(camera_theta) * np.sin(camera_theta2)
+        camY = 10 * np.cos(camera_theta) * np.sin(camera_theta2)
+        camZ = 10 * np.cos(camera_theta2)
 
-        viewPos = np.array([camX, camY, 10])
+
+        viewPos = np.array([camX, camY, camZ])
 
         view = tr.lookAt(
             viewPos,
