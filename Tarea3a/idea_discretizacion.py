@@ -28,9 +28,9 @@ def getIJK(k,W,L,H,h):
     nw = int(W/h) -1
     nl = int(L/h) -1
     nh = int(H/h) -1
-    z = k//(nh*nw)
-    y = (k%(nh*nw))//nw
-    x = (k%(nh*nw))%nw
+    z = k//(nl*nw)
+    y = (k%(nl*nw))//nw
+    x = (k%(nl*nw))%nw
     return (x,y,z)
 
 
@@ -40,8 +40,11 @@ def solveMatrix(A,b):
 
 def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
     nw = int(W/h) -1 #x
+    print(nw,'nw')
     nl = int(L/h) -1    #y
+    print(nl,'nl')
     nh = int(H/h) -1  #z
+    print(nh,'nh')
     print('ns',nw,nl,nh,(nw)*(nl)*(nh))
 
     N = (nw)*(nl)*(nh)
@@ -147,9 +150,9 @@ def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
                         b[k] = -header_a
                         A[k, k_z] = 1
 
-                    #elif (l_quinto*3<y and y< l_quinto * 4) and (w_tercio<x and x<w_tercio*2):
-                    #    b[k] = -header_b
-                    #    A[k, k_z] = 1
+                    elif (l_quinto*3<y and y< l_quinto * 4) and (w_tercio<x and x<w_tercio*2):
+                        b[k] = -header_b
+                        A[k, k_z] = 1
                     
                     else:
                         b[k] = 0
@@ -388,7 +391,9 @@ def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
 
 #matriz_resuelta = matrix(4,3,5,0.1,25,0.1,25,30,"solution")
 #matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
-matriz_resuelta = matrix(4,3,5,0.25,25,0.1,25,30,"solution")
+matriz_resuelta = matrix(3,6,4,0.25,25,0.1,30,30,"solution")
+#matriz_resuelta = matrix(4,3,5,1,25,0.1,25,30,"solution")
+print(matriz_resuelta)
 #matriz_resuelta = matrix(3,6,4,0.25,25,0.1,25,30,"solution")
 # 3 6 4    4 6
 #vector_resuelto = solveMatrix(matriz_resuelta[0],matriz_resuelta[1])

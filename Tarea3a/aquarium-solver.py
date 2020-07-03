@@ -163,7 +163,9 @@ if __name__ == "__main__":
     #matriz_resuelta = matrix(4,3,5,1,25,0.1,25,30,"solution")
     #X, Y, Z = np.mgrid[0:2:8, 0:2:8j, 0:2:8j]
     #X, Y, Z = np.mgrid[0:4:20j, 0:5:25j, 0:3:15j]
-    X, Y, Z = np.mgrid[-1:1:16j, -1:1:20j, -1:1:12j]
+    ###################4     3       5
+    ###3,6,4
+    X, Y, Z = np.mgrid[-1.5:1.5:12j, -3:3:24j, -2:2:16j]
     #X, Y, Z = np.mgrid[0:2:8j, 0:2.5:10j, 0:1.5:6j]
     print(load_voxels.shape)
     print(range(X.shape[0]-1),range(X.shape[1]-1),range(X.shape[2]-1))
@@ -171,9 +173,10 @@ if __name__ == "__main__":
     isosurface = bs.Shape([], [])
     
     # Now let's draw voxels!
-    for i in range(X.shape[0]-1):
+    for k in range(X.shape[2]-1):
         for j in range(X.shape[1]-1):
-            for k in range(X.shape[2]-1):
+            for i in range(X.shape[0]-1):
+                print(i,j,k)
                 if load_voxels[i,j,k]:
                     temp_shape = createColorCube(i,j,k, X,Y, Z,load_voxels[i,j,k]/30)
                     merge(destinationShape=isosurface, strideSize=6, sourceShape=temp_shape)
