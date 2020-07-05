@@ -11,6 +11,7 @@ import Modulo.basic_shapes as bs
 
 
 def createColorCube(i, j, k, X, Y, Z,c):
+    c=(c/40)**3
     l_x = X[i, j, k]
     r_x = X[i+1, j, k]
     b_y = Y[i, j, k]
@@ -21,35 +22,35 @@ def createColorCube(i, j, k, X, Y, Z,c):
     #   positions    colors
     vertices = [
     # Z+: number 1
-        l_x, b_y,  t_z, c,0,1-c,
-         r_x, b_y,  t_z, c,0,1-c,
-         r_x,  f_y,  t_z, c,0,1-c,
-        l_x,  f_y,  t_z, c,0,1-c,
+        l_x, b_y,  t_z, c,0,0.01,
+         r_x, b_y,  t_z, c,0,0.01,
+         r_x,  f_y,  t_z, c,0,0.01,
+        l_x,  f_y,  t_z, c,0,0.01,
     # Z-: number 6
-        l_x, b_y, b_z, c,0,1-c,
-         r_x, b_y, b_z, c,0,1-c,
-         r_x,  f_y, b_z, c,0,1-c,
-        l_x,  f_y, b_z, c,0,1-c,
+        l_x, b_y, b_z, c,0,0.01,
+         r_x, b_y, b_z, c,0,0.01,
+         r_x,  f_y, b_z, c,0,0.01,
+        l_x,  f_y, b_z, c,0,0.01,
     # X+: number 5
-         r_x, b_y, b_z, c,0,1-c,
-         r_x,  f_y, b_z, c,0,1-c,
-         r_x,  f_y,  t_z, c,0,1-c,
-         r_x, b_y,  t_z, c,0,1-c,
+         r_x, b_y, b_z, c,0,0.01,
+         r_x,  f_y, b_z, c,0,0.01,
+         r_x,  f_y,  t_z, c,0,0.01,
+         r_x, b_y,  t_z, c,0,0.01,
     # X-: number 2
-        l_x, b_y, b_z, c,0,1-c,
-        l_x,  f_y, b_z, c,0,1-c,
-        l_x,  f_y,  t_z, c,0,1-c,
-        l_x, b_y,  t_z, c,0,1-c,
+        l_x, b_y, b_z, c,0,0.01,
+        l_x,  f_y, b_z, c,0,0.01,
+        l_x,  f_y,  t_z, c,0,0.01,
+        l_x, b_y,  t_z, c,0,0.01,
     # Y+: number 4
-        l_x,  f_y, b_z, c,0,1-c,
-        r_x,  f_y, b_z, c,0,1-c,
-        r_x,  f_y, t_z, c,0,1-c,
-        l_x,  f_y, t_z, c,0,1-c,
+        l_x,  f_y, b_z, c,0,0.01,
+        r_x,  f_y, b_z, c,0,0.01,
+        r_x,  f_y, t_z, c,0,0.01,
+        l_x,  f_y, t_z, c,0,0.01,
     # Y-: number 3
-        l_x, b_y, b_z, c,0,1-c,
-        r_x, b_y, b_z, c,0,1-c,
-        r_x, b_y, t_z, c,0,1-c,
-        l_x, b_y, t_z, c,0,1-c,
+        l_x, b_y, b_z, c,0,0.01,
+        r_x, b_y, b_z, c,0,0.01,
+        r_x, b_y, t_z, c,0,0.01,
+        l_x, b_y, t_z, c,0,0.01,
         ]
 
     # Defining connections among vertices
@@ -176,9 +177,9 @@ if __name__ == "__main__":
     for k in range(X.shape[2]-1):
         for j in range(X.shape[1]-1):
             for i in range(X.shape[0]-1):
-                print(i,j,k)
+                print(load_voxels[i,j,k])
                 if load_voxels[i,j,k]:
-                    temp_shape = createColorCube(i,j,k, X,Y, Z,load_voxels[i,j,k]/30)
+                    temp_shape = createColorCube(i,j,k, X,Y, Z,load_voxels[i,j,k])
                     merge(destinationShape=isosurface, strideSize=6, sourceShape=temp_shape)
 
 
