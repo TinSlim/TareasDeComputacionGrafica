@@ -1,268 +1,436 @@
-import glfw
-from OpenGL.GL import *
-import OpenGL.GL.shaders
 import numpy as np
-import sys
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
-import Modulo.transformations as tr
-import Modulo.easy_shaders as es
-import Modulo.basic_shapes as bs
-import Modulo.basic_shapes as bs
+from scipy.sparse import csc_matrix
+from scipy.sparse.linalg import spsolve
 
+import json
 
-def createColorCube(i, j, k, X, Y, Z,c):
-    c=(c/40)**3
-    l_x = X[i, j, k]
-    r_x = X[i+1, j, k]
-    b_y = Y[i, j, k]
-    f_y = Y[i, j+1, k]
-    b_z = Z[i, j, k]
-    t_z = Z[i, j, k+1]
-    #c = np.random.rand
-    #   positions    colors
-    vertices = [
-    # Z+: number 1
-        l_x, b_y,  t_z, c,0,0.01,
-         r_x, b_y,  t_z, c,0,0.01,
-         r_x,  f_y,  t_z, c,0,0.01,
-        l_x,  f_y,  t_z, c,0,0.01,
-    # Z-: number 6
-        l_x, b_y, b_z, c,0,0.01,
-         r_x, b_y, b_z, c,0,0.01,
-         r_x,  f_y, b_z, c,0,0.01,
-        l_x,  f_y, b_z, c,0,0.01,
-    # X+: number 5
-         r_x, b_y, b_z, c,0,0.01,
-         r_x,  f_y, b_z, c,0,0.01,
-         r_x,  f_y,  t_z, c,0,0.01,
-         r_x, b_y,  t_z, c,0,0.01,
-    # X-: number 2
-        l_x, b_y, b_z, c,0,0.01,
-        l_x,  f_y, b_z, c,0,0.01,
-        l_x,  f_y,  t_z, c,0,0.01,
-        l_x, b_y,  t_z, c,0,0.01,
-    # Y+: number 4
-        l_x,  f_y, b_z, c,0,0.01,
-        r_x,  f_y, b_z, c,0,0.01,
-        r_x,  f_y, t_z, c,0,0.01,
-        l_x,  f_y, t_z, c,0,0.01,
-    # Y-: number 3
-        l_x, b_y, b_z, c,0,0.01,
-        r_x, b_y, b_z, c,0,0.01,
-        r_x, b_y, t_z, c,0,0.01,
-        l_x, b_y, t_z, c,0,0.01,
-        ]
+def reader(json_file):
+    with open(json_file) as f:
+        data = json.load(f)
+        return data
 
-    # Defining connections among vertices
-    # We have a triangle every 3 indices specified
-    indices = [
-        0, 1, 2, 2, 3, 0,
-        4, 5, 6, 6, 7, 4,
-        4, 5, 1, 1, 0, 4,
-        6, 7, 3, 3, 2, 6,
-        5, 6, 2, 2, 1, 5,
-        7, 4, 0, 0, 3, 7]
+try:
+    archivo_json=str(sys.argv[1])
+except:
+    archivo_json="problem-setup.json"
 
-    return bs.Shape(vertices, indices)
+archivo_json=reader(archivo_json)
+
+# Variables del JSON
+W = archivo_json["width"]
+L = archivo_json["lenght"]
+H = archivo_json["height"]
+
+h_a = archivo_json["heater_a"]
+h_b = archivo_json["heater_b"]
+win_loss = archivo_json["window_loss"]
+amb_temp = archivo_json["ambient_temperature"]
+filename = archivo_json["filename"]
+
+# Espaciado
+h = 0.2
 
 
-def merge(destinationShape, strideSize, sourceShape):
+#c = 1  #contstat
+#B = 0
 
-    # current vertices are an offset for indices refering to vertices of the new shape
-    offset = len(destinationShape.vertices)
-    destinationShape.vertices += sourceShape.vertices
-    destinationShape.indices += [(offset/strideSize) + index for index in sourceShape.indices]
-
-
-PROJECTION_ORTHOGRAPHIC = 0
-PROJECTION_FRUSTUM = 1
-PROJECTION_PERSPECTIVE = 2
+#nw = int(W/h) -1
+#nl = int(L/h) -1
+#nh = int(H/h) -1
 
 
+# Entrega indexación a partir de X,Y,Z; Tamaño Acuario y espaciado
+def getK(x,y,z,W,L,H,h):
+    nw = int(W/h) -1
+    nl = int(L/h) -1
+    nh = int(H/h) -1
+    return x+nw*y+z*nl*nw
 
-# A class to store the application control
-class Controller:
-    def __init__(self):
-        self.fillPolygon = True
-        self.projection = PROJECTION_ORTHOGRAPHIC
+def getIJK(k,W,L,H,h):
+    nw = int(W/h) -1
+    nl = int(L/h) -1
+    nh = int(H/h) -1
+    z = k//(nl*nw)
+    y = (k%(nl*nw))//nw
+    x = (k%(nl*nw))%nw
+    return (x,y,z)
 
 
-# We will use the global controller as communication with the callback function
-controller = Controller()
+def solveMatrix(A,b):
+    return np.linalg.solve(A,b)
 
 
-def on_key(window, key, scancode, action, mods):
+def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
+    nw = int(W/h) -1 #x
+    print(nw,'nw')
+    nl = int(L/h) -1    #y
+    print(nl,'nl')
+    nh = int(H/h) -1  #z
+    print(nh,'nh')
+    print('ns',nw,nl,nh,(nw)*(nl)*(nh))
 
-    if action != glfw.PRESS:
-        return
+    N = (nw)*(nl)*(nh)
+
+    A = csc_matrix((N,N))
+
+    #A = np.zeros(((nw)*(nl)*(nh),(nw)*(nl)*(nh)))
+    b = np.zeros(nw*nl*nh)
+    #b = np.zeros ((nw+1)*(nl+1)*(nw+1))
+    #print( len(A),len(b),'lens')
+
+    for z in range(nh):
+        print(z)
+        print(z,'Z_actual')
+        for y in range(nl):
+            for x in range(nw):
+
+                k = getK(x,y,z,W,L,H,h)
+                
+                k_x = getK(x+1,y,z,W,L,H,h)
+                k__x = getK(x-1,y,z,W,L,H,h)
+                k_y = getK(x,y+1,z,W,L,H,h)
+                k__y = getK(x,y-1,z,W,L,H,h)
+                k_z = getK(x,y,z+1,W,L,H,h)
+                k__z = getK(x,y,z-1,W,L,H,h)
+                #centro
+                if (1<=x and x<=nw -2) and (1<=y and y<=nl-2) and (1<=z and z<=nh-2):
+                    A[k, k_x] = 1
+                    A[k, k__x] = 1
+                    A[k, k_y] = 1
+                    A[k, k__y] = 1
+                    A[k, k_z] = 1
+                    A[k, k__z] = 1
+                    A[k,k] = -6
+                    b[k] = 0
+
+                ##########################
+                #+x
+                elif (x==nw-1) and (1<=y and y<=nl-2) and (1<=z and z<=nh-2):
+                    #A[k, k_x] = 0
+                    A[k, k__x] = 2 
+                    A[k, k_y] = 1
+                    A[k, k__y] = 1
+                    A[k, k_z] = 1
+                    A[k, k__z] = 1
+                    A[k,k] = -6
+                    b[k] = -2*h*B
+
+                #_x
+                elif (x==0) and (1<=y and y<=nl-2) and (1<=z and z<=nh-2):
+                    A[k, k_x] =2
+                    #A[k, k__x] = 0
+                    A[k, k_y] = 1
+                    A[k, k__y] = 1
+                    A[k, k_z] = 1
+                    A[k, k__z] = 1
+                    A[k,k] = -6
+                    b[k] = -2*h*B
+
+                #+y
+                elif (1<=x and x<=nw -2) and (y==nl-1) and (1<=z and z<=nh-2):
+                    A[k, k_x] = 1
+                    A[k, k__x] = 1 
+                    #A[k, k_y] = 0
+                    A[k, k__y] = 2
+                    A[k, k_z] = 1
+                    A[k, k__z] = 1
+                    A[k,k] = -6
+                    b[k] = -2*h*B
+
+                #_y
+                elif (1<=x and x<=nw -2) and (y==0) and (1<=z and z<=nh-2):
+                    A[k, k_x] = 1
+                    A[k, k__x] = 1 
+                    A[k, k_y] = 2
+                    #A[k, k__y] = 0
+                    A[k, k_z] = 1
+                    A[k, k__z] = 1
+                    A[k,k] = -6
+                    b[k] = -2*h*B
+
+                #+z arreglar
+                elif (1<=x and x<=nw -2) and (1<=y and y<=nl-2) and (z==nh-1):
+                    A[k, k_x] = 1
+                    A[k, k__x] = 1 
+                    A[k, k_y] = 1
+                    A[k, k__y] = 1
+                    #A[k, k_z] = 0
+                    A[k, k__z] = 1
+                    A[k,k] = -6
+                    b[k] = - C
+
+                #_z Agregar heater#####
+                elif (1<=x and x<=nw -2) and (1<=y and y<=nl-2) and (z==0):
+                    l_quinto = (nl)/5
+                    w_tercio = (nw)/3
+                    #if (l_quinto<x and x< l_quinto * 2) and (w_tercio<y and y<w_tercio*2):
+                    #    b[k] = -header_a
+                    #elif (l_quinto*3<x and x< l_quinto * 4) and (w_tercio<y and y<w_tercio*2):
+                    #    b[k] = -header_b
+                   # else:
+                    #    b[k] = 0
+                    if  (l_quinto<y and y< l_quinto * 2) and (w_tercio<x and x<w_tercio*2):
+                        b[k] = -header_a
+                        A[k, k_z] = 1
+
+                    elif (l_quinto*3<y and y< l_quinto * 4) and (w_tercio<x and x<w_tercio*2):
+                        b[k] = -header_b
+                        A[k, k_z] = 1
+                    
+                    else:
+                        b[k] = 0
+                        A[k,k_z] = 2
+
+                    A[k, k_x] = 1
+                    A[k, k__x] = 1 
+                    A[k, k_y] = 1
+                    A[k, k__y] = 1
+                    A[k,k] = -6
+                ## if x or y 000 blabal
+                        
+                #3 paredes ##
+                elif (x==0) and (y==0) and (z==0):
+                    A[k, k_x] =2
+                    #A[k, k__x] = 0 
+                    A[k, k_y] = 2
+                    #A[k, k__y] = 0
+                    A[k, k_z] = 2
+                    #A[k, k__z] = 0
+                    A[k,k] = -6
+                    b[k] = -4*h*B  
+
+                elif (x==0) and (y==0) and (z==nh-1):
+                    A[k, k_x] =2
+                    #A[k, k__x] = 0 
+                    A[k, k_y] = 2
+                    #A[k, k__y] = 0
+                    #A[k, k_z] = 0
+                    A[k, k__z] = 1
+                    A[k,k] = -6
+                    b[k] = -4*h*B - C
+
+                elif (x==0) and (y==nl-1) and (z==0):
+                    A[k, k_x] =2
+                    #A[k, k__x] = 0 
+                    #A[k, k_y] = 0
+                    A[k, k__y] = 2
+                    A[k, k_z] = 2
+                    #A[k, k__z] = 0
+                    A[k,k] = -6
+                    b[k] = -4*h*B  
+
+                elif (x==0) and (y==nl-1) and (z==nh-1):
+                    A[k, k_x] =2
+                    #A[k, k__x] = 0 
+                    #A[k, k_y] = 0
+                    A[k, k__y] = 2
+                    #A[k, k_z] = 0
+                    A[k, k__z] = 1
+                    A[k,k] = -6
+                    b[k] = -4*h*B - C  
+             
+                elif (x==nw -1) and (y==0) and (z==0):
+                    #A[k, k_x] =0
+                    A[k, k__x] = 2 
+                    A[k, k_y] = 2
+                    #A[k, k__y] = 0
+                    A[k, k_z] = 2
+                    #A[k, k__z] = 0
+                    A[k,k] = -6
+                    b[k] = -4*h*B
+
+                elif (x==nw -1) and (y==0) and (z==nh-1):
+                    #A[k, k_x] =0
+                    A[k, k__x] = 2 
+                    A[k, k_y] = 2
+                    #A[k, k__y] = 0
+                    #A[k, k_z] = 0
+                    A[k, k__z] = 1
+                    A[k,k] = -6
+                    b[k] = -4*h*B - C  
+
+                elif (x==nw -1) and (y==nl-1) and (z==0):
+                    #A[k, k_x] =0
+                    A[k, k__x] = 2 
+                    #A[k, k_y] = 0
+                    A[k, k__y] = 2
+                    A[k, k_z] = 2
+                    #A[k, k__z] = 0
+                    A[k,k] = -6
+                    b[k] = -4*h*B
+
+                elif (x==nw -1) and (y==nl-1) and (z==nh-1):
+                    #A[k, k_x] =0
+                    A[k, k__x] = 2 
+                    #A[k, k_y] = 0
+                    A[k, k__y] = 2
+                    #A[k, k_z] = 0
+                    A[k, k__z] = 1
+                    A[k,k] = -6
+                    b[k] = -4*h*B - C  
+
+
+
+                ##2 paredes##
+                
+                elif (1<=x and x<=nw -2) and (y==nl-1) and (z==nh-1):
+                    A[k, k_x] = 1
+                    A[k, k__x] = 1 
+                    #A[k, k_y] = 0
+                    A[k, k__y] = 2
+                    #A[k, k_z] = 0
+                    A[k, k__z] = 1
+                    A[k,k] = -6
+                    b[k] = -C -2*h*B
+                
+                elif (1<=x and x<=nw -2) and (y==0) and (z==nh-1):
+                    A[k, k_x] = 1
+                    A[k, k__x] = 1 
+                    A[k, k_y] = 2
+                    #A[k, k__y] = 0
+                    #A[k, k_z] = 0
+                    A[k, k__z] = 1
+                    A[k,k] = -6
+                    b[k] = -C-2*h*B
+
+                elif (1<=x and x<=nw -2) and (y==nl-1) and (z==0):
+                    A[k, k_x] = 1
+                    A[k, k__x] = 1 
+                    #A[k, k_y] = 0
+                    A[k, k__y] = 2
+                    A[k, k_z] = 2
+                    #A[k, k__z] = 0
+                    A[k,k] = -6
+                    b[k] = -2*h*B
+                
+                elif (1<=x and x<=nw -2) and (y==0) and (z==0):
+                    A[k, k_x] = 1
+                    A[k, k__x] = 1 
+                    A[k, k_y] = 2
+                    #A[k, k__y] = 0
+                    A[k, k_z] = 2
+                    #A[k, k__z] = 0
+                    A[k,k] = -6
+                    b[k] = -2*h*B
+
+                ###########################
+                elif (x==nw -1) and (1<=y and y<=nl-2) and (z==nh-1):
+                    #A[k, k_x] = 0
+                    A[k, k__x] = 2 
+                    A[k, k_y] = 1
+                    A[k, k__y] = 1
+                    #A[k, k_z] = 0
+                    A[k, k__z] = 1
+                    A[k,k] = -6
+                    b[k] = -2*h*B -C
+                
+                elif (x==0) and (1<=y and y<=nl-2) and (z==nh-1):
+                    A[k, k_x] = 2
+                    #A[k, k__x] = 0 
+                    A[k, k_y] = 1
+                    A[k, k__y] = 1
+                    #A[k, k_z] = 0
+                    A[k, k__z] = 1
+                    A[k,k] = -6
+                    b[k] = -2*h*B -C          
+
+
+                elif (x==nw -1) and (1<=y and y<=nl-2) and (z==0):
+                    #A[k, k_x] = 0
+                    A[k, k__x] = 2 
+                    A[k, k_y] = 1
+                    A[k, k__y] = 1
+                    A[k, k_z] = 2
+                    #A[k, k__z] = 0
+                    A[k,k] = -6
+                    b[k] = -2*h*B 
+                
+                elif (x==0) and (1<=y and y<=nl-2) and (z==0):
+                    A[k, k_x] = 2
+                    #A[k, k__x] = 0 
+                    A[k, k_y] = 1
+                    A[k, k__y] = 1
+                    A[k, k_z] = 2
+                    #A[k, k__z] = 0
+                    A[k,k] = -6
+                    b[k] = -2*h*B
+                ##############################
+
+                elif (x==nw -1) and (y==nl-1) and (1<=z and z<=nh-2):
+                    #A[k, k_x] =0
+                    A[k, k__x] = 2 
+                    #A[k, k_y] = 0
+                    A[k, k__y] = 2
+                    A[k, k_z] = 1
+                    A[k, k__z] = 1
+                    A[k,k] = -6
+                    b[k] = -4*h*B
+
+                elif (x==nw -1) and (y==0) and (1<=z and z<=nh-2):
+                    #A[k, k_x] =0
+                    A[k, k__x] = 2 
+                    A[k, k_y] = 2
+                    #A[k, k__y] = 0
+                    A[k, k_z] = 1
+                    A[k, k__z] = 1
+                    A[k,k] = -6
+                    b[k] = -4*h*B 
+
+                elif (x==0) and (y==nl-1) and (1<=z and z<=nh-2):
+                    A[k, k_x] =2
+                    #A[k, k__x] = 0 
+                    #A[k, k_y] = 0
+                    A[k, k__y] = 2
+                    A[k, k_z] = 1
+                    A[k, k__z] = 1
+                    A[k,k] = -6
+                    b[k] = -4*h*B
+
+                elif (x==0) and (y==0) and (1<=z and z<=nh-2):
+                    A[k, k_x] =2
+                    #A[k, k__x] = 0 
+                    A[k, k_y] = 2
+                    #A[k, k__y] = 0
+                    A[k, k_z] = 1
+                    A[k, k__z] = 1
+                    A[k,k] = -6
+                    b[k] = -4*h*B 
+
     
-    global controller
+    #vector_resuelto = solveMatrix(A,b)
+    vector_resuelto = spsolve(A, b)
 
-    if key == glfw.KEY_SPACE:
-        controller.fillPolygon = not controller.fillPolygon
-
-    elif key == glfw.KEY_1:
-        print('Orthographic projection')
-        controller.projection = PROJECTION_ORTHOGRAPHIC
-
-    elif key == glfw.KEY_2:
-        print('Frustum projection')
-        controller.projection = PROJECTION_FRUSTUM
-
-    elif key == glfw.KEY_3:
-        print('Perspective projection')
-        controller.projection = PROJECTION_PERSPECTIVE
-
-    elif key == glfw.KEY_ESCAPE:
-        glfw.set_window_should_close(window, True)
-
-
-
-if __name__ == "__main__":
-
-    # Initialize glfw
-    if not glfw.init():
-        sys.exit()
-
-    width = 600
-    height = 600
-
-    window = glfw.create_window(width, height, "Projections Demo", None, None)
-
-    if not window:
-        glfw.terminate()
-        sys.exit()
-
-    glfw.make_context_current(window)
-
-    # Connecting the callback function 'on_key' to handle keyboard events
-    glfw.set_key_callback(window, on_key)
-
-    # Assembling the shader program
-    pipeline = es.SimpleModelViewProjectionShaderProgram()
-
-    # Telling OpenGL to use our shader program
-    glUseProgram(pipeline.shaderProgram)
-
-    # Setting up the clear screen color
-    glClearColor(0.15, 0.15, 0.15, 1.0)
-
-    # As we work in 3D, we need to check which part is in front,
-    # and which one is at the back
-    glEnable(GL_DEPTH_TEST)
-
-    # Creating shapes on GPU memory
-    gpuAxis = es.toGPUShape(bs.createAxis(7))
+    #TODO Ver bien
+    tamanio = getIJK(len(vector_resuelto)-1,W,L,H,h)
+    Matriz_ultima = np.zeros( (tamanio[0] +1,tamanio[1] +1 ,tamanio[2]+1) )
+    indice = 0
+    for numero in vector_resuelto:
+        coordenada = getIJK(indice,W,L,H,h)
+        Matriz_ultima[coordenada] = numero
+        indice+=1
     
-    # Load potentials and grid
-    load_voxels = np.load('solution.npy')
-    #X, Y, Z = np.mgrid[-2:2:20j, -2:2:20j, -2:2:20j]
-    #X, Y, Z = np.mgrid[0:2:8j, 0:2.5:10j, 0:1.5:6j]
+    np.save(nombre_final, Matriz_ultima)
+    return Matriz_ultima
 
 
-    #X, Y, Z = np.mgrid[0:2:20j, 0:2.5:25j, 0:1.5:15j]
-    #matriz_resuelta = matrix(4,3,5,1,25,0.1,25,30,"solution")
-    #X, Y, Z = np.mgrid[0:2:8, 0:2:8j, 0:2:8j]
-    #X, Y, Z = np.mgrid[0:4:20j, 0:5:25j, 0:3:15j]
-    ###################4     3       5
-    ###3,6,4
-    X, Y, Z = np.mgrid[-1.5:1.5:12j, -3:3:24j, -2:2:16j]
-    #X, Y, Z = np.mgrid[0:2:8j, 0:2.5:10j, 0:1.5:6j]
-    print(load_voxels.shape)
-    print(range(X.shape[0]-1),range(X.shape[1]-1),range(X.shape[2]-1))
 
-    isosurface = bs.Shape([], [])
-    
-    # Now let's draw voxels!
-    for k in range(X.shape[2]-1):
-        for j in range(X.shape[1]-1):
-            for i in range(X.shape[0]-1):
-                print(load_voxels[i,j,k])
-                if load_voxels[i,j,k]:
-                    temp_shape = createColorCube(i,j,k, X,Y, Z,load_voxels[i,j,k])
-                    merge(destinationShape=isosurface, strideSize=6, sourceShape=temp_shape)
+#matriz_resuelta = matrix(4,3,5,0.1,25,0.1,25,30,"solution")
+#matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
+
+#matriz_resuelta = matrix(3,6,4,0.25,25,0.1,30,5,"solution")
+
+matriz_resuelta = matrix(W,L,H,0.2,amb_temp,win_loss,h_a,h_b,"solution")
 
 
-    gpu_surface = es.toGPUShape(isosurface)
+#matriz_resuelta = matrix(4,3,5,1,25,0.1,25,30,"solution")
+print(matriz_resuelta)
+#matriz_resuelta = matrix(3,6,4,0.25,25,0.1,25,30,"solution")
+# 3 6 4    4 6
+#vector_resuelto = solveMatrix(matriz_resuelta[0],matriz_resuelta[1])
+#print(vector_resuelto)
 
 
-    t0 = glfw.get_time()
-    camera_theta = np.pi/4
-    camera_theta2 = 0
-
-    while not glfw.window_should_close(window):
-        # Using GLFW to check for input events
-        glfw.poll_events()
-
-        # Getting the time difference from the previous iteration
-        t1 = glfw.get_time()
-        dt = t1 - t0
-        t0 = t1
-
-        if (glfw.get_key(window, glfw.KEY_LEFT) == glfw.PRESS):
-            camera_theta -= 2 * dt
-
-        if (glfw.get_key(window, glfw.KEY_RIGHT) == glfw.PRESS):
-            camera_theta += 2* dt
-
-        if (glfw.get_key(window, glfw.KEY_DOWN) == glfw.PRESS):
-            camera_theta2 += 2*dt
-
-        if (glfw.get_key(window, glfw.KEY_UP) == glfw.PRESS):
-            camera_theta2 -= 2*dt
-
-        # Setting up the view transform
-
-        camX = 10 * np.sin(camera_theta) * np.sin(camera_theta2)
-        camY = 10 * np.cos(camera_theta) * np.sin(camera_theta2)
-        camZ = 10 * np.cos(camera_theta2)
-
-
-        viewPos = np.array([camX, camY, camZ])
-
-        view = tr.lookAt(
-            viewPos,
-            np.array([0,0,0]),
-            np.array([0,0,1])
-        )
-
-        glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "view"), 1, GL_TRUE, view)
-
-        # Setting up the projection transform
-
-        if controller.projection == PROJECTION_ORTHOGRAPHIC:
-            projection = tr.ortho(-8, 8, -8, 8, 0.1, 100)
-
-        elif controller.projection == PROJECTION_FRUSTUM:
-            projection = tr.frustum(-5, 5, -5, 5, 9, 100)
-
-        elif controller.projection == PROJECTION_PERSPECTIVE:
-            projection = tr.perspective(60, float(width)/float(height), 0.1, 100)
-        
-        else:
-            raise Exception()
-
-        glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "projection"), 1, GL_TRUE, projection)
-
-
-        # Clearing the screen in both, color and depth
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
-        # Filling or not the shapes depending on the controller state
-        if (controller.fillPolygon):
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-        else:
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-
-        # Drawing shapes with different model transformations
-        glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE, tr.translate(5,0,0))
-
-        
-        glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE, tr.uniformScale(3))
-        pipeline.drawShape(gpuAxis, GL_LINES)
-        pipeline.drawShape(gpu_surface)
-
-        # Once the drawing is rendered, buffers are swap so an uncomplete drawing is never seen.
-        glfw.swap_buffers(window)
-
-    glfw.terminate()
+#print(matriz_resuelta)
