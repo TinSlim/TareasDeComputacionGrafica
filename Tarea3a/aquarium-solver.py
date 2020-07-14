@@ -43,16 +43,18 @@ h = 0.2
 
 
 # Entrega indexación a partir de X,Y,Z; Tamaño Acuario y espaciado
+
+#//
 def getK(x,y,z,W,L,H,h):
-    nw = int(W/h) -1
-    nl = int(L/h) -1
-    nh = int(H/h) -1
+    nw = int(W//h) -1
+    nl = int(L//h) -1
+    nh = int(H//h) -1
     return x+nw*y+z*nl*nw
 
 def getIJK(k,W,L,H,h):
-    nw = int(W/h) -1
-    nl = int(L/h) -1
-    nh = int(H/h) -1
+    nw = int(W//h) -1
+    nl = int(L//h) -1
+    nh = int(H//h) -1
     z = k//(nl*nw)
     y = (k%(nl*nw))//nw
     x = (k%(nl*nw))%nw
@@ -64,11 +66,11 @@ def solveMatrix(A,b):
 
 
 def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
-    nw = int(W/h) -1 #x
+    nw = int(W//h) -1 #x
     print(nw,'nw')
-    nl = int(L/h) -1    #y
+    nl = int(L//h) -1    #y
     print(nl,'nl')
-    nh = int(H/h) -1  #z
+    nh = int(H//h) -1  #z
     print(nh,'nh')
     print('ns',nw,nl,nh,(nw)*(nl)*(nh))
 
@@ -171,11 +173,11 @@ def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
                     #    b[k] = -header_b
                    # else:
                     #    b[k] = 0
-                    if  (l_quinto<y and y< l_quinto * 2) and (w_tercio<x and x<w_tercio*2):
+                    if  (l_quinto<=y and y<= l_quinto * 2) and (w_tercio<=x and x<=w_tercio*2):
                         b[k] = -header_a
                         A[k, k_z] = 1
 
-                    elif (l_quinto*3<y and y< l_quinto * 4) and (w_tercio<x and x<w_tercio*2):
+                    elif (l_quinto*3<=y and y<= l_quinto * 4) and (w_tercio<=x and x<=w_tercio*2):
                         b[k] = -header_b
                         A[k, k_z] = 1
                     
@@ -418,5 +420,32 @@ def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
 
 
 
+#ub[1:nw + 1, 1:nl + 1, 1:nh + 1] = u[:, :, :]
+#ub[0:nw + 2, 0:nl + 2, nh + 1] = AMBIENT_TEMPERATURE
+
 # Se ejecuta discretización
 matriz_resuelta = matrix(W,L,H,0.2,amb_temp,win_loss,h_a,h_b,filename)
+
+#ub = np.zeros((nw + 2, nl + 2, nh + 2))
+#ub[1:nw + 1, 1:nl + 1, 1:nh + 1] = u[:, :, :]
+#ub[0:nw + 2, 0:nl + 2, nh + 1] = AMBIENT_TEMPERATURE
+# We will write the equation associated with row m
+            #m = getM(i, j, k)
+            # We obtain indices of the other coefficients
+            #m_up = getM(i, j + 1, k)
+            #m_down = getM(i, j - 1, k)
+            #m_left = getM(i - 1, j, k)
+            #m_right = getM(i + 1, j, k)
+            #m_near = getM(i, j, k + 1)
+            #m_far = getM(i, j, k - 1)
+
+# Solving our system
+#x = scipy.sparse.linalg.spsolve(A, b)
+
+# Now we return our solution to the 3D discrete domain
+# In this matrix we will store the solution in the 3D domain
+#u = np.zeros((nw, nl, nh))
+
+#for m in range(N):
+#    i, j, k = getIJK(m)
+#    u[i, j, k] = x[m]
