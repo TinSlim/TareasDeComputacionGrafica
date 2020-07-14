@@ -82,8 +82,7 @@ def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
     #print( len(A),len(b),'lens')
 
     for z in range(nh):
-        print(z)
-        print(z,'Z_actual')
+        print(str(z*100//(nh-1))+'% Completado de Discretización')
         for y in range(nl):
             for x in range(nw):
 
@@ -400,10 +399,11 @@ def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
                     b[k] = -4*h*B 
 
     
-    #vector_resuelto = solveMatrix(A,b)
+
+    print('Espere Resolución de la Matriz')
     vector_resuelto = spsolve(A, b)
 
-    #TODO Ver bien
+
     tamanio = getIJK(len(vector_resuelto)-1,W,L,H,h)
     Matriz_ultima = np.zeros( (tamanio[0] +1,tamanio[1] +1 ,tamanio[2]+1) )
     indice = 0
@@ -413,24 +413,10 @@ def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
         indice+=1
     
     np.save(nombre_final, Matriz_ultima)
+    print('Discretización completada con éxito, ',nombre_final)
     return Matriz_ultima
 
 
 
-#matriz_resuelta = matrix(4,3,5,0.1,25,0.1,25,30,"solution")
-#matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
-
-#matriz_resuelta = matrix(3,6,4,0.25,25,0.1,30,5,"solution")
-
-matriz_resuelta = matrix(W,L,H,0.2,amb_temp,win_loss,h_a,h_b,"solution")
-
-
-#matriz_resuelta = matrix(4,3,5,1,25,0.1,25,30,"solution")
-print(matriz_resuelta)
-#matriz_resuelta = matrix(3,6,4,0.25,25,0.1,25,30,"solution")
-# 3 6 4    4 6
-#vector_resuelto = solveMatrix(matriz_resuelta[0],matriz_resuelta[1])
-#print(vector_resuelto)
-
-
-#print(matriz_resuelta)
+# Se ejecuta discretización
+matriz_resuelta = matrix(W,L,H,0.2,amb_temp,win_loss,h_a,h_b,filename)
