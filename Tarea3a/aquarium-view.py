@@ -28,6 +28,8 @@ archivo_json=reader(archivo_json)
 # Variables del JSON
 filename = archivo_json["filename"]
 
+print(filename)
+
 t_a = archivo_json["t_a"]
 t_b = archivo_json["t_b"]
 t_c = archivo_json["t_c"]
@@ -36,62 +38,6 @@ n_a = archivo_json["t_a"]
 n_b = archivo_json["t_a"]
 n_c = archivo_json["t_a"]
 
-
-def createColorPez2(i, j, k, X, Y, Z,c):
-    l_x = X[i, j, k]
-    r_x = X[i+1, j, k]
-    b_y = Y[i, j, k]
-    f_y = Y[i, j+1, k]
-    b_z = Z[i, j, k]
-    t_z = Z[i, j, k+1]
-    altura = abs(t_z-b_z)
-    ancho = abs(f_y-b_y)
-    #c = np.random.rand
-    #   positions    colors
-    vertices = [
-    # Z+: number 1
-        l_x, b_y+ancho/5,  t_z-altura/6, c,0,1-c,
-         r_x, b_y+ancho/5, t_z-altura/6, c,0,1-c,
-         r_x,  f_y-ancho/5,  t_z-altura/6, c,0,1-c,
-        l_x,  f_y-ancho/5,  t_z-altura/6, c,0,1-c,
-    # Z-: number 6
-        l_x, b_y+ancho/5, b_z+altura/6, c,0,1-c,
-         r_x, b_y+ancho/5, b_z+altura/6, c,0,1-c,
-         r_x,  f_y-ancho/5, b_z+altura/6, c,0,1-c,
-        l_x,  f_y-ancho/5, b_z+altura/6, c,0,1-c,
-    # X+: number 5
-         r_x, b_y+ancho/5, b_z+altura/6, c,0,1-c,
-         r_x,  f_y-ancho/5, b_z+altura/6, c,0,1-c,
-         r_x,  f_y-ancho/5,  t_z-altura/6, c,0,1-c,
-         r_x, b_y+ancho/5,  t_z-altura/6, c,0,1-c,
-    # X-: number 2
-        l_x, b_y+ancho/5, b_z+altura/6, c,0,1-c,
-        l_x,  f_y-ancho/5, b_z+altura/6, c,0,1-c,
-        l_x,  f_y-ancho/5,  t_z-altura/6, c,0,1-c,
-        l_x, b_y+ancho/5,  t_z-altura/6, c,0,1-c,
-    # Y+: number 4
-        l_x,  f_y-ancho/5, b_z+altura/6, c,0,1-c,
-        r_x,  f_y-ancho/5, b_z+altura/6, c,0,1-c,
-        r_x,  f_y-ancho/5, t_z-altura/6, c,0,1-c,
-        l_x,  f_y-ancho/5, t_z-altura/6, c,0,1-c,
-    # Y-: number 3
-        l_x, b_y+ancho/5, b_z+altura/6, c,0,1-c,
-        r_x, b_y+ancho/5, b_z+altura/6, c,0,1-c,
-        r_x, b_y+ancho/5, t_z-altura/6, c,0,1-c,
-        l_x, b_y+ancho/5, t_z-altura/6, c,0,1-c,
-         ]
-
-    # Defining connections among vertices
-    # We have a triangle every 3 indices specified
-    indices = [
-        0, 1, 2, 2, 3, 0,
-        4, 5, 6, 6, 7, 4,
-        4, 5, 1, 1, 0, 4,
-        6, 7, 3, 3, 2, 6,
-        5, 6, 2, 2, 1, 5,
-        7, 4, 0, 0, 3, 7,]
-
-    return bs.Shape(vertices, indices)
 
 def createColorCubeAleta(i, j, k, X, Y, Z,c):
     l_x = X[i, j, k]
@@ -321,6 +267,165 @@ def createColorPez(i, j, k, X, Y, Z,c):
 
     return bs.Shape(vertices, indices)
 
+
+def createColorPez1(i, j, k, X, Y, Z,c):
+    l_x = X[i, j, k]
+    r_x = X[i+1, j, k]
+    b_y = Y[i, j, k]
+    f_y = Y[i, j+1, k]
+    b_z = Z[i, j, k]
+    t_z = Z[i, j, k+1]
+    altura = abs(t_z-b_z)
+    ancho = abs(f_y-b_y)
+    largo = abs(l_x-r_x)
+    #c = np.random.rand
+    #   positions    colors
+    vertices = [
+    # Z+: number 1
+        l_x, b_y+ancho/3,  t_z, c,0,1-c,
+         r_x, b_y+ancho/3, t_z, c,0,1-c,
+         r_x,  f_y-ancho/3,  t_z, c,0,1-c,
+        l_x,  f_y-ancho/3,  t_z, c,0,1-c,
+    # Z-: number 6
+        l_x, b_y+ancho/3, b_z, c,0,1-c,
+         r_x, b_y+ancho/3, b_z, c,0,1-c,
+         r_x,  f_y-ancho/3, b_z, c,0,1-c,
+        l_x,  f_y-ancho/3, b_z, c,0,1-c,
+        
+        ######f_y-ancho/5*2
+        l_x+largo, b_y+ancho/3,  t_z-altura/6, c,0,1-c,
+         r_x+largo/3, b_y+ancho/3, t_z-altura/4, c,0,1-c,
+         r_x+largo/3,  f_y-ancho/3,  t_z-altura/4, c,0,1-c,
+        l_x+largo/3,  f_y-ancho/3,  t_z-altura/6, c,0,1-c,
+    # Z-: number 6
+        l_x+largo/3, b_y+ancho/3, b_z+altura/6, c,0,1-c,
+         r_x+largo/3, b_y+ancho/3, b_z+altura/4, c,0,1-c,
+         r_x+largo/3,  f_y-ancho/3, b_z+altura/4, c,0,1-c,
+        l_x+largo/3,  f_y-ancho/3, b_z+altura/6, c,0,1-c,
+        
+        
+        
+        l_x+largo/3, b_y+ancho/4,  t_z-altura/3, c,0,1-c,
+         r_x, b_y+ancho/4, t_z-altura/3, c,0,1-c,
+         r_x,  f_y-ancho/4,  t_z-altura/3, c,0,1-c,
+        l_x+largo/3,  f_y-ancho/4,  t_z-altura/3, c,0,1-c,
+    # Z-: number 6
+        l_x+largo/3, b_y+ancho/4, b_z+altura/3, c,0,1-c,
+         r_x, b_y+ancho/4, b_z+altura/3, c,0,1-c,
+         r_x,  f_y-ancho/4, b_z+altura/3, c,0,1-c,
+        l_x+largo/3,  f_y-ancho/4, b_z+altura/3, c,0,1-c]
+
+
+
+
+
+    # Defining connections among vertices
+    # We have a triangle every 3 indices specified
+    indices = [
+        0, 1, 2, 2, 3, 0,
+        4, 5, 6, 6, 7, 4,
+        4, 5, 1, 1, 0, 4,
+        6, 7, 3, 3, 2, 6,
+        5, 6, 2, 2, 1, 5,
+        7, 4, 0, 0, 3, 7,
+        
+        8, 9, 10, 10, 11, 8,
+        12, 13, 14, 14, 15, 12,
+        12, 13, 8, 8, 9, 12,
+        14, 15, 11, 11, 10, 14,
+        13, 14, 10, 10, 9, 13,
+        15, 12, 8, 8, 11, 15,
+        
+        16,17,18,18,19,16,
+        20,21,22,22,23,20,
+        20,21,16,16,17,20,
+        22,23,19,19,18,22,
+        21,22,18,18,17,21,
+        23,20,16,16,19,23]
+
+    return bs.Shape(vertices, indices)
+
+
+def createColorPez2(i, j, k, X, Y, Z,c):
+    l_x = X[i, j, k]
+    r_x = X[i+1, j, k]
+    b_y = Y[i, j, k]
+    f_y = Y[i, j+1, k]
+    b_z = Z[i, j, k]
+    t_z = Z[i, j, k+1]
+    altura = abs(t_z-b_z)
+    ancho = abs(f_y-b_y)
+    largo = abs(l_x-r_x)
+    #c = np.random.rand
+    #   positions    colors
+    vertices = [
+    # Z+: number 1
+        l_x, b_y+ancho/7,  t_z-altura/2.5, c,0,1-c,
+         r_x, b_y+ancho/7, t_z-altura/2.5, c,0,1-c,
+         r_x,  f_y-ancho/7,  t_z-altura/2.5, c,0,1-c,
+        l_x,  f_y-ancho/7,  t_z-altura/2.5, c,0,1-c,
+    # Z-: number 6
+        l_x, b_y+ancho/7, b_z+altura/2.5, c,0,1-c,
+         r_x, b_y+ancho/7, b_z+altura/2.5, c,0,1-c,
+         r_x,  f_y-ancho/7, b_z+altura/2.5, c,0,1-c,
+        l_x,  f_y-ancho/7, b_z+altura/2.5, c,0,1-c,
+        
+        ######f_y-ancho/5*2
+        l_x+largo, b_y+ancho/5,  t_z-altura/2.5, c,0,1-c,
+         r_x+largo/3, b_y+ancho/5, t_z-altura/2.5, c,0,1-c,
+         r_x+largo/3,  f_y-ancho/5,  t_z-altura/2.5, c,0,1-c,
+        l_x+largo/3,  f_y-ancho/5,  t_z-altura/2.5, c,0,1-c,
+    # Z-: number 6
+        l_x+largo/3, b_y+ancho/5, b_z+altura/2.5, c,0,1-c,
+         r_x+largo/3, b_y+ancho/5, b_z+altura/2.5, c,0,1-c,
+         r_x+largo/3,  f_y-ancho/5, b_z+altura/2.5, c,0,1-c,
+        l_x+largo/3,  f_y-ancho/5, b_z+altura/2.5, c,0,1-c,
+        
+        
+        
+        l_x+largo/3, b_y,  t_z-altura/3, c,0,1-c,
+         r_x, b_y, t_z-altura/3, c,0,1-c,
+         r_x,  f_y,  t_z-altura/3, c,0,1-c,
+        l_x+largo/3,  f_y,  t_z-altura/3, c,0,1-c,
+    # Z-: number 6
+        l_x+largo/3, b_y, b_z+altura/3, c,0,1-c,
+         r_x, b_y, b_z+altura/3, c,0,1-c,
+         r_x,  f_y, b_z+altura/3, c,0,1-c,
+        l_x+largo/3,  f_y, b_z+altura/3, c,0,1-c]
+
+
+
+
+
+    # Defining connections among vertices
+    # We have a triangle every 3 indices specified
+    indices = [
+        0, 1, 2, 2, 3, 0,
+        4, 5, 6, 6, 7, 4,
+        4, 5, 1, 1, 0, 4,
+        6, 7, 3, 3, 2, 6,
+        5, 6, 2, 2, 1, 5,
+        7, 4, 0, 0, 3, 7,
+        
+        8, 9, 10, 10, 11, 8,
+        12, 13, 14, 14, 15, 12,
+        12, 13, 8, 8, 9, 12,
+        14, 15, 11, 11, 10, 14,
+        13, 14, 10, 10, 9, 13,
+        15, 12, 8, 8, 11, 15,
+        
+        16,17,18,18,19,16,
+        20,21,22,22,23,20,
+        20,21,16,16,17,20,
+        22,23,19,19,18,22,
+        21,22,18,18,17,21,
+        23,20,16,16,19,23]
+
+    return bs.Shape(vertices, indices)
+
+
+
+
 def createPez(lista_coord, F, G, H,c,n):
     peces = [ ]
     lista = lista_coord
@@ -332,7 +437,7 @@ def createPez(lista_coord, F, G, H,c,n):
         aleta = createColorCubeAleta(nuevo[0], nuevo[1], nuevo[2], F, G, H,c)
         aleta_pos.append([aleta[1],aleta[2],aleta[3]])
         peces.append(es.toGPUShape(aleta[0]))
-        peces.append(es.toGPUShape(createColorPez(nuevo[0], nuevo[1], nuevo[2], F, G, H,c)))
+        peces.append(es.toGPUShape(createColorPez2(nuevo[0], nuevo[1], nuevo[2], F, G, H,c)))
         n-=1
     return peces,aleta_pos
     
@@ -519,8 +624,15 @@ if __name__ == "__main__":
     camera_theta = np.pi/4
     camera_theta2 = -1
 
-    angulo_aleta = 0
+    angulo_aleta = -0.8
+    angulo_aleta1 = -0.4
+    angulo_aleta2 = 0.4
+    angulo_aleta3 = -0.8
+
     ang_der = True
+    ang_der1 = True
+    ang_der2 = True
+    ang_der3 = True
     radio = 10
 
     while not glfw.window_should_close(window):
@@ -532,6 +644,8 @@ if __name__ == "__main__":
         dt = t1 - t0
         t0 = t1
         #print(angulo_aleta)
+
+
         if ang_der:
             angulo_aleta+=0.05
             if angulo_aleta>=0.8:
@@ -541,6 +655,41 @@ if __name__ == "__main__":
             if angulo_aleta<=-0.8:
                 ang_der = not ang_der
 
+        ####
+
+        if ang_der1:
+            angulo_aleta1+=0.03
+            if angulo_aleta1>=0.8:
+                ang_der1 = not ang_der1
+        else:
+            angulo_aleta1-=0.03
+            if angulo_aleta1<=-0.8:
+                ang_der1 = not ang_der1
+        
+        ####
+
+        if ang_der2:
+            angulo_aleta2+=0.04
+            if angulo_aleta2>=0.8:
+                ang_der2 = not ang_der2
+        else:
+            angulo_aleta2-=0.04
+            if angulo_aleta2<=-0.8:
+                ang_der2 = not ang_der2
+
+        ###
+
+        if ang_der3:
+            angulo_aleta3+=0.05
+            if angulo_aleta3>=0.8:
+                ang_der3 = not ang_der3
+        else:
+            angulo_aleta3-=0.05
+            if angulo_aleta3<=-0.8:
+                ang_der3 = not ang_der3
+
+
+        
         if (glfw.get_key(window, glfw.KEY_LEFT) == glfw.PRESS):
             camera_theta -= 2 * dt
 
@@ -612,14 +761,26 @@ if __name__ == "__main__":
 
         
         glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE, tr.uniformScale(3))
-        pipeline.drawShape(gpuAxis, GL_LINES)
+        #pipeline.drawShape(gpuAxis, GL_LINES)
 
         if not controller.A:
             x=0
+            y=-1
+            alete = 0
             for p in shapePezA[0]:
+                y+=1
+                if y ==0:
+                    angulo_alete = angulo_aleta
+                elif y ==1:
+                    angulo_alete = angulo_aleta1
+                elif y ==2:
+                    angulo_alete = angulo_aleta2
+                elif y ==4:
+                    angulo_alete = angulo_aleta3
+                    y=-1
                 if x%2==0:
                     posicion_ale = [shapePezA[1][x//2][0],shapePezA[1][x//2][1],shapePezA[1][x//2][2]]
-                    glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE,tr.matmul([ tr.uniformScale(3),tr.translate(posicion_ale[0],posicion_ale[1],posicion_ale[2]),tr.rotationZ(angulo_aleta),tr.translate(-posicion_ale[0],-posicion_ale[1],-posicion_ale[2])]))
+                    glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE,tr.matmul([ tr.uniformScale(3),tr.translate(posicion_ale[0],posicion_ale[1],posicion_ale[2]),tr.rotationZ(angulo_alete),tr.translate(-posicion_ale[0],-posicion_ale[1],-posicion_ale[2])]))
                     pipeline.drawShape(p)
                 else:
                     glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE, tr.uniformScale(3))
@@ -628,10 +789,22 @@ if __name__ == "__main__":
 
         if not controller.B:
             x=0
+            y=-1
+            alete = 0
             for p in shapePezB[0]:
+                y+=1
+                if y ==0:
+                    angulo_alete = angulo_aleta
+                elif y ==1:
+                    angulo_alete = angulo_aleta1
+                elif y ==2:
+                    angulo_alete = angulo_aleta2
+                elif y ==4:
+                    angulo_alete = angulo_aleta3
+                    y=-1
                 if x%2==0:
                     posicion_ale = [shapePezB[1][x//2][0],shapePezB[1][x//2][1],shapePezB[1][x//2][2]]
-                    glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE,tr.matmul([ tr.uniformScale(3),tr.translate(posicion_ale[0],posicion_ale[1],posicion_ale[2]),tr.rotationZ(angulo_aleta),tr.translate(-posicion_ale[0],-posicion_ale[1],-posicion_ale[2])]))
+                    glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE,tr.matmul([ tr.uniformScale(3),tr.translate(posicion_ale[0],posicion_ale[1],posicion_ale[2]),tr.rotationZ(angulo_alete),tr.translate(-posicion_ale[0],-posicion_ale[1],-posicion_ale[2])]))
                     pipeline.drawShape(p)
                 else:
                     glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE, tr.uniformScale(3))
@@ -640,10 +813,22 @@ if __name__ == "__main__":
 
         if not controller.C:
             x=0
+            y=-1
+            alete = 0
             for p in shapePezC[0]:
+                y+=1
+                if y ==0:
+                    angulo_alete = angulo_aleta
+                elif y ==1:
+                    angulo_alete = angulo_aleta1
+                elif y ==2:
+                    angulo_alete = angulo_aleta2
+                elif y ==4:
+                    angulo_alete = angulo_aleta3
+                    y=-1
                 if x%2==0:
                     posicion_ale = [shapePezC[1][x//2][0],shapePezC[1][x//2][1],shapePezC[1][x//2][2]]
-                    glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE,tr.matmul([ tr.uniformScale(3),tr.translate(posicion_ale[0],posicion_ale[1],posicion_ale[2]),tr.rotationZ(angulo_aleta),tr.translate(-posicion_ale[0],-posicion_ale[1],-posicion_ale[2])]))
+                    glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE,tr.matmul([ tr.uniformScale(3),tr.translate(posicion_ale[0],posicion_ale[1],posicion_ale[2]),tr.rotationZ(angulo_alete),tr.translate(-posicion_ale[0],-posicion_ale[1],-posicion_ale[2])]))
                     
                     #glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "model"), 1, GL_TRUE,tr.matmul([ tr.uniformScale(3),tr.translate(-posicion_ale[0],-posicion_ale[1],-posicion_ale[2])]))
                 
