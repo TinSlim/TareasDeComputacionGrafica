@@ -437,6 +437,38 @@ def createPez(lista_coord, F, G, H,c,n):
         aleta = createColorCubeAleta(nuevo[0], nuevo[1], nuevo[2], F, G, H,c)
         aleta_pos.append([aleta[1],aleta[2],aleta[3]])
         peces.append(es.toGPUShape(aleta[0]))
+        peces.append(es.toGPUShape(createColorPez(nuevo[0], nuevo[1], nuevo[2], F, G, H,c)))
+        n-=1
+    return peces,aleta_pos
+    
+
+def createPez1(lista_coord, F, G, H,c,n):
+    peces = [ ]
+    lista = lista_coord
+    random.shuffle(lista)
+    pez = n
+    aleta_pos = []
+    while n >0:
+        nuevo = lista.pop()
+        aleta = createColorCubeAleta(nuevo[0], nuevo[1], nuevo[2], F, G, H,c)
+        aleta_pos.append([aleta[1],aleta[2],aleta[3]])
+        peces.append(es.toGPUShape(aleta[0]))
+        peces.append(es.toGPUShape(createColorPez1(nuevo[0], nuevo[1], nuevo[2], F, G, H,c)))
+        n-=1
+    return peces,aleta_pos
+
+
+def createPez2(lista_coord, F, G, H,c,n):
+    peces = [ ]
+    lista = lista_coord
+    random.shuffle(lista)
+    pez = n
+    aleta_pos = []
+    while n >0:
+        nuevo = lista.pop()
+        aleta = createColorCubeAleta(nuevo[0], nuevo[1], nuevo[2], F, G, H,c)
+        aleta_pos.append([aleta[1],aleta[2],aleta[3]])
+        peces.append(es.toGPUShape(aleta[0]))
         peces.append(es.toGPUShape(createColorPez2(nuevo[0], nuevo[1], nuevo[2], F, G, H,c)))
         n-=1
     return peces,aleta_pos
@@ -604,15 +636,10 @@ if __name__ == "__main__":
                         coordenadas_t_c.append([i,j,k])
                     
                     
-
-
-                
-
-                    
     
     shapePezA = createPez(coordenadas_t_a, X, Y, Z,1,n_a)
-    shapePezB = createPez(coordenadas_t_b, X, Y, Z,0.6,n_b)
-    shapePezC = createPez(coordenadas_t_c, X, Y, Z,0.3,n_c)
+    shapePezB = createPez1(coordenadas_t_b, X, Y, Z,0.6,n_b)
+    shapePezC = createPez2(coordenadas_t_c, X, Y, Z,0.3,n_c)
 
     gpu_surfaceA = es.toGPUShape(isosurfaceA)
     gpu_surfaceB = es.toGPUShape(isosurfaceB)
