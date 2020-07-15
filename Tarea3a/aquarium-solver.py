@@ -118,6 +118,7 @@ def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
                     A[k, k__z] = 1
                     A[k,k] = -6
                     b[k] = -2*h*B
+                    
 
                 #_x
                 elif (x==0) and (1<=y and y<=nl-2) and (1<=z and z<=nh-2):
@@ -129,6 +130,7 @@ def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
                     A[k, k__z] = 1
                     A[k,k] = -6
                     b[k] = -2*h*B
+                    
 
                 #+y
                 elif (1<=x and x<=nw -2) and (y==nl-1) and (1<=z and z<=nh-2):
@@ -140,6 +142,7 @@ def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
                     A[k, k__z] = 1
                     A[k,k] = -6
                     b[k] = -2*h*B
+                    
 
                 #_y
                 elif (1<=x and x<=nw -2) and (y==0) and (1<=z and z<=nh-2):
@@ -151,8 +154,9 @@ def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
                     A[k, k__z] = 1
                     A[k,k] = -6
                     b[k] = -2*h*B
+                    
 
-                #+z arreglar
+                #+z 
                 elif (1<=x and x<=nw -2) and (1<=y and y<=nl-2) and (z==nh-1):
                     A[k, k_x] = 1
                     A[k, k__x] = 1 
@@ -162,6 +166,7 @@ def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
                     A[k, k__z] = 1
                     A[k,k] = -6
                     b[k] = - C
+                    
 
                 #_z Agregar heater#####
                 elif (1<=x and x<=nw -2) and (1<=y and y<=nl-2) and (z==0):
@@ -173,11 +178,11 @@ def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
                     #    b[k] = -header_b
                    # else:
                     #    b[k] = 0
-                    if  (l_quinto<=y and y<= l_quinto * 2) and (w_tercio<=x and x<=w_tercio*2):
+                    if  (l_quinto<=y and y<l_quinto * 2) and (w_tercio<=x and x<w_tercio*2):
                         b[k] = -header_a
                         A[k, k_z] = 1
 
-                    elif (l_quinto*3<=y and y<= l_quinto * 4) and (w_tercio<=x and x<=w_tercio*2):
+                    elif (l_quinto*3<=y and y< l_quinto * 4) and (w_tercio<=x and x<w_tercio*2):
                         b[k] = -header_b
                         A[k, k_z] = 1
                     
@@ -338,7 +343,6 @@ def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
                     A[k,k] = -6
                     b[k] = -2*h*B -C          
 
-
                 elif (x==nw -1) and (1<=y and y<=nl-2) and (z==0):
                     #A[k, k_x] = 0
                     A[k, k__x] = 2 
@@ -407,45 +411,21 @@ def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
 
 
     tamanio = getIJK(len(vector_resuelto)-1,W,L,H,h)
-    Matriz_ultima = np.zeros( (tamanio[0] +1,tamanio[1] +1 ,tamanio[2]+1) )
+    Matriz_ultima = np.zeros((nw, nl, nh))
+
+    #Matriz_ultima = np.zeros( (tamanio[0] +1,tamanio[1] +1 ,tamanio[2]+1) )
     indice = 0
     for numero in vector_resuelto:
         coordenada = getIJK(indice,W,L,H,h)
         Matriz_ultima[coordenada] = numero
         indice+=1
     
+
     np.save(nombre_final, Matriz_ultima)
     print('Discretización completada con éxito, ',nombre_final)
+    
     return Matriz_ultima
 
 
-
-#ub[1:nw + 1, 1:nl + 1, 1:nh + 1] = u[:, :, :]
-#ub[0:nw + 2, 0:nl + 2, nh + 1] = AMBIENT_TEMPERATURE
-
 # Se ejecuta discretización
-matriz_resuelta = matrix(W,L,H,0.2,amb_temp,win_loss,h_a,h_b,filename)
-
-#ub = np.zeros((nw + 2, nl + 2, nh + 2))
-#ub[1:nw + 1, 1:nl + 1, 1:nh + 1] = u[:, :, :]
-#ub[0:nw + 2, 0:nl + 2, nh + 1] = AMBIENT_TEMPERATURE
-# We will write the equation associated with row m
-            #m = getM(i, j, k)
-            # We obtain indices of the other coefficients
-            #m_up = getM(i, j + 1, k)
-            #m_down = getM(i, j - 1, k)
-            #m_left = getM(i - 1, j, k)
-            #m_right = getM(i + 1, j, k)
-            #m_near = getM(i, j, k + 1)
-            #m_far = getM(i, j, k - 1)
-
-# Solving our system
-#x = scipy.sparse.linalg.spsolve(A, b)
-
-# Now we return our solution to the 3D discrete domain
-# In this matrix we will store the solution in the 3D domain
-#u = np.zeros((nw, nl, nh))
-
-#for m in range(N):
-#    i, j, k = getIJK(m)
-#    u[i, j, k] = x[m]
+matriz_resuelta = matrix(W,L,H,h,amb_temp,win_loss,h_a,h_b,filename)

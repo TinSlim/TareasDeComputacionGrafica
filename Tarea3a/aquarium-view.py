@@ -590,7 +590,7 @@ if __name__ == "__main__":
 
     division = max(largo_x,largo_y,largo_z)
     #X, Y, Z = np.mgrid[-1.5:1.5:(largo_x*1j), -3:3:(largo_y*1j), -2:2:(largo_z*1j)]
-    X, Y, Z = np.mgrid[-(largo_x/division):(largo_x/division):(largo_x*1j), -(largo_y/division):(largo_y/division):(largo_y*1j), -(largo_z/division):(largo_z/division):(largo_z*1j)]
+    X, Y, Z = np.mgrid[-(largo_x/division):(largo_x/division):((largo_x+3)*1j), -(largo_y/division):(largo_y/division):((largo_y+3)*1j), -(largo_z/division):(largo_z/division):((largo_z+3)*1j)]
 
 
 
@@ -610,14 +610,20 @@ if __name__ == "__main__":
     coordenadas_t_b = []
     coordenadas_t_c = []
     
-    
+    #print(len(load_voxels)) #13 voxeles
+    #print(len(load_voxels[0])) #28 voxeles
+    print(X.shape[0])
+    print(X.shape[1])
+    print(X.shape[2])
+    #print(load_voxels[X.shape[0]-3])
+    #print(load_voxels[X.shape])
 
-    for k in range(X.shape[2]-1):
-        for j in range(X.shape[1]-1):
-            for i in range(X.shape[0]-1):
+    for k in range(0,X.shape[2]-3):
+        for j in range(0,X.shape[1]-3):
+            for i in range(0,X.shape[0]-3):
                 if load_voxels[i,j,k]:
                     
-                    if ( (i==0 or i==X.shape[0]-2) and (j==0 or j==X.shape[1]-2 or k==0 or k==X.shape[2]-2) )  or   ((j==0 or j==X.shape[1]-2) and (i==0 or i==X.shape[0]-2 or k==0 or k==X.shape[2]-2)) or ((j==0 or j==X.shape[1]-2 or i==0 or i==X.shape[0]-2) and (k==0 or k==X.shape[2]-2)):
+                    if ( (i==0 or i==X.shape[0]-4) and (j==0 or j==X.shape[1]-4 or k==0 or k==X.shape[2]-4) )  or   ((j==0 or j==X.shape[1]-4) and (i==0 or i==X.shape[0]-4 or k==0 or k==X.shape[2]-4)) or ((j==0 or j==X.shape[1]-4 or i==0 or i==X.shape[0]-4) and (k==0 or k==X.shape[2]-4)):
                         temp_shape = createColorCubeBorde(i,j,k, X,Y, Z,0.1)
                         merge(destinationShape=isosurfaceBorde, strideSize=6, sourceShape=temp_shape)
 
@@ -637,7 +643,10 @@ if __name__ == "__main__":
                         coordenadas_t_c.append([i,j,k])
                     
                     
-    
+    print(len(coordenadas_t_a),'T,a')
+    print(len(coordenadas_t_b),'T,b')
+    print(len(coordenadas_t_c),'T,c')
+
     shapePezA = createPez(coordenadas_t_a, X, Y, Z,1,n_a)
     shapePezB = createPez(coordenadas_t_b, X, Y, Z,0.6,n_b)
     shapePezC = createPez(coordenadas_t_c, X, Y, Z,0.3,n_c)
