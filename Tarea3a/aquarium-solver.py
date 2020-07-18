@@ -37,23 +37,16 @@ filename = archivo_json["filename"]
 limite = max(W,L,H)
 h = (0.2/6) * limite
 
-#c = 1  #contstat
-#B = 0
-
-#nw = int(W/h) -1
-#nl = int(L/h) -1
-#nh = int(H/h) -1
 
 
-# Entrega indexación a partir de X,Y,Z; Tamaño Acuario y espaciado
-
-#//
+# Obtener indexación desde tres dimensiones
 def getK(x,y,z,W,L,H,h):
     nw = int(W//h) -1
     nl = int(L//h) -1
     nh = int(H//h) -1
     return x+nw*y+z*nl*nw
 
+# Devolver a tres dimensiones
 def getIJK(k,W,L,H,h):
     nw = int(W//h) -1
     nl = int(L//h) -1
@@ -67,15 +60,11 @@ def getIJK(k,W,L,H,h):
 def solveMatrix(A,b):
     return np.linalg.solve(A,b)
 
-
+# Discretización
 def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
     nw = int(W//h) -1 #x
-    print(nw,'nw')
     nl = int(L//h) -1    #y
-    print(nl,'nl')
     nh = int(H//h) -1  #z
-    print(nh,'nh')
-    print('ns',nw,nl,nh,(nw)*(nl)*(nh))
 
     #Se crean matrices
     N = (nw)*(nl)*(nh)
