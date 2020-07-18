@@ -8,8 +8,7 @@ import random
 import Modulo.transformations as tr
 import Modulo.easy_shaders as es
 import Modulo.basic_shapes as bs
-import Modulo.basic_shapes as bs
-import Modulo.readobj as robj
+
 
 import json
 
