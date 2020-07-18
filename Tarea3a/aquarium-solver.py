@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import sys
 
 from scipy.sparse import csc_matrix
 from scipy.sparse.linalg import spsolve
@@ -12,10 +13,12 @@ def reader(json_file):
         data = json.load(f)
         return data
 
+
 try:
     archivo_json=str(sys.argv[1])
 except:
     archivo_json="problem-setup.json"
+
 
 archivo_json=reader(archivo_json)
 
@@ -31,8 +34,8 @@ amb_temp = archivo_json["ambient_temperature"]
 filename = archivo_json["filename"]
 
 # Espaciado
-h = 0.2
-
+limite = max(W,L,H)
+h = (0.2/6) * limite
 
 #c = 1  #contstat
 #B = 0
@@ -74,15 +77,12 @@ def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
     print(nh,'nh')
     print('ns',nw,nl,nh,(nw)*(nl)*(nh))
 
+    #Se crean matrices
     N = (nw)*(nl)*(nh)
-
     A = csc_matrix((N,N))
-
-    #A = np.zeros(((nw)*(nl)*(nh),(nw)*(nl)*(nh)))
     b = np.zeros(nw*nl*nh)
-    #b = np.zeros ((nw+1)*(nl+1)*(nw+1))
-    #print( len(A),len(b),'lens')
 
+    #Se llena la matriz A
     for z in range(nh):
         print(str(z*100//(nh-1))+'% Completado de Discretización')
         for y in range(nl):
@@ -411,9 +411,15 @@ def matrix(W,L,H,h,C,B,header_a,header_b,nombre_final):
 
 
     tamanio = getIJK(len(vector_resuelto)-1,W,L,H,h)
-    Matriz_ultima = np.zeros((nw, nl, nh))
+    Matriz_ultima = np.zeros((nw, nl, nh+1))
 
-    #Matriz_ultima = np.zeros( (tamanio[0] +1,tamanio[1] +1 ,tamanio[2]+1) )
+
+    #Dirichlet se agrega el borde después de resolver la edp
+    for x in range(nw):
+        for y in range(nl):
+            Matriz_ultima[x,y,nh] = C
+
+    #Se pasan datos de la edp a la Matriz que se guardará
     indice = 0
     for numero in vector_resuelto:
         coordenada = getIJK(indice,W,L,H,h)

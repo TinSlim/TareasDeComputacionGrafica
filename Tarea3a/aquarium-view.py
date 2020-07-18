@@ -13,22 +13,23 @@ import Modulo.readobj as robj
 
 import json
 
+# Lector de Json
 def reader(json_file):
     with open(json_file) as f:
         data = json.load(f)
         return data
 
+# Se lee archivo, si no está se usa uno de prueba
 try:
     archivo_json=str(sys.argv[1])
 except:
     archivo_json="view-setup.json"
 
+# Se transforma
 archivo_json=reader(archivo_json)
 
 # Variables del JSON
 filename = archivo_json["filename"]
-
-
 
 t_a = archivo_json["t_a"]
 t_b = archivo_json["t_b"]
@@ -39,6 +40,7 @@ n_b = archivo_json["t_a"]
 n_c = archivo_json["t_a"]
 
 
+# Funcion para crear aleta
 def createColorCubeAleta(i, j, k, X, Y, Z,c):
     l_x = X[i, j, k]
     r_x = X[i+1, j, k]
@@ -78,7 +80,7 @@ def createColorCubeAleta(i, j, k, X, Y, Z,c):
 
     return (bs.Shape(vertices, indices),l_x, b_y+ancho/2, t_z-altura/2) #LX -0.05
 
-
+# Funcion para crear cubo
 def createColorCube(i, j, k, X, Y, Z,c):
     l_x = X[i, j, k]
     r_x = X[i+1, j, k]
@@ -133,7 +135,7 @@ def createColorCube(i, j, k, X, Y, Z,c):
 
     return bs.Shape(vertices, indices)
 
-
+# Funcion para crear cubo del borde
 def createColorCubeBorde(i, j, k, X, Y, Z,c):
     l_x = X[i, j, k]
     r_x = X[i+1, j, k]
@@ -188,8 +190,7 @@ def createColorCubeBorde(i, j, k, X, Y, Z,c):
 
     return bs.Shape(vertices, indices)
 
-
-
+# Funcion para crear Pez1
 def createColorPez(i, j, k, X, Y, Z,c):
     l_x = X[i, j, k]
     r_x = X[i+1, j, k]
@@ -267,7 +268,7 @@ def createColorPez(i, j, k, X, Y, Z,c):
 
     return bs.Shape(vertices, indices),[l_x+(largo/2),b_y+(ancho/2),b_z+(altura/2)]   #
 
-
+# Funcion para crear Pez2
 def createColorPez1(i, j, k, X, Y, Z,c):
     l_x = X[i, j, k]
     r_x = X[i+1, j, k]
@@ -345,7 +346,7 @@ def createColorPez1(i, j, k, X, Y, Z,c):
 
     return bs.Shape(vertices, indices)
 
-
+# Funcion para crear Pez3
 def createColorPez2(i, j, k, X, Y, Z,c):
     l_x = X[i, j, k]
     r_x = X[i+1, j, k]
@@ -424,8 +425,7 @@ def createColorPez2(i, j, k, X, Y, Z,c):
     return bs.Shape(vertices, indices)
 
 
-
-
+# Funcion para crear peces1
 def createPez(lista_coord, F, G, H,c,n):
     peces = [ ]
     lista = lista_coord
@@ -442,8 +442,8 @@ def createPez(lista_coord, F, G, H,c,n):
         peces.append(es.toGPUShape(aleta[0]))
         n-=1
     return peces,aleta_pos
-    
 
+# Funcion para crear peces2
 def createPez1(lista_coord, F, G, H,c,n):
     peces = [ ]
     lista = lista_coord
@@ -459,7 +459,7 @@ def createPez1(lista_coord, F, G, H,c,n):
         n-=1
     return peces,aleta_pos
 
-
+# Funcion para crear peces3
 def createPez2(lista_coord, F, G, H,c,n):
     peces = [ ]
     lista = lista_coord
@@ -484,6 +484,7 @@ def merge(destinationShape, strideSize, sourceShape):
     destinationShape.indices += [(offset/strideSize) + index for index in sourceShape.indices]
 
 
+# Proyecciones
 PROJECTION_ORTHOGRAPHIC = 0
 PROJECTION_FRUSTUM = 1
 PROJECTION_PERSPECTIVE = 2
@@ -515,7 +516,7 @@ def on_key(window, key, scancode, action, mods):
     if key == glfw.KEY_SPACE:
         controller.fillPolygon = not controller.fillPolygon
 
-
+    # Para combinar áreas habitables
     elif key == glfw.KEY_A:
         controller.A = not controller.A
 
@@ -525,8 +526,7 @@ def on_key(window, key, scancode, action, mods):
     elif key == glfw.KEY_C:
         controller.C = not controller.C
 
-
-
+    # Proyecciones
     elif key == glfw.KEY_1:
         print('Orthographic projection')
         controller.projection = PROJECTION_ORTHOGRAPHIC
@@ -583,84 +583,80 @@ if __name__ == "__main__":
     # Load potentials and grid
     load_voxels = np.load(filename)
 
-  
+    # Se definen tamanhos de lo que se dibuja
     largo_x = len(load_voxels)
     largo_y = len(load_voxels[0])
     largo_z = len(load_voxels[0][0])
 
+    # Valor de escala para no proyectar algo gigante
     division = max(largo_x,largo_y,largo_z)
-    #X, Y, Z = np.mgrid[-1.5:1.5:(largo_x*1j), -3:3:(largo_y*1j), -2:2:(largo_z*1j)]
+
     X, Y, Z = np.mgrid[-(largo_x/division):(largo_x/division):((largo_x+3)*1j), -(largo_y/division):(largo_y/division):((largo_y+3)*1j), -(largo_z/division):(largo_z/division):((largo_z+3)*1j)]
 
-
-
-    #print(load_voxels.shape)
-    #print(range(X.shape[0]-1),range(X.shape[1]-1),range(X.shape[2]-1))
-
+    # Los voxeles habitables
     isosurfaceA = bs.Shape([], [])
     isosurfaceB = bs.Shape([], [])
     isosurfaceC = bs.Shape([], [])
-
+    
+    # Borde Acuario
     isosurfaceBorde = bs.Shape([], [])
 
-    
-    # Now let's draw voxels!
-
+    # Coordenadas donde aparecerán peces
     coordenadas_t_a = []
     coordenadas_t_b = []
     coordenadas_t_c = []
     
-    #print(len(load_voxels)) #13 voxeles
-    #print(len(load_voxels[0])) #28 voxeles
-    print(X.shape[0])
-    print(X.shape[1])
-    print(X.shape[2])
-    #print(load_voxels[X.shape[0]-3])
-    #print(load_voxels[X.shape])
+    #Se buscan voxeles habitables y de borde
+    for k in range(0,X.shape[2]-1):
+        for j in range(0,X.shape[1]-1):
+            for i in range(0,X.shape[0]-1):
 
-    for k in range(0,X.shape[2]-3):
-        for j in range(0,X.shape[1]-3):
-            for i in range(0,X.shape[0]-3):
-                if load_voxels[i,j,k]:
-                    
-                    if ( (i==0 or i==X.shape[0]-4) and (j==0 or j==X.shape[1]-4 or k==0 or k==X.shape[2]-4) )  or   ((j==0 or j==X.shape[1]-4) and (i==0 or i==X.shape[0]-4 or k==0 or k==X.shape[2]-4)) or ((j==0 or j==X.shape[1]-4 or i==0 or i==X.shape[0]-4) and (k==0 or k==X.shape[2]-4)):
+                # Borde acuario
+                if ( (i==0 or i==X.shape[0]-2) and (j==0 or j==X.shape[1]-2 or k==0 or k==X.shape[2]-2) )  or   ((j==0 or j==X.shape[1]-2) and (i==0 or i==X.shape[0]-2 or k==0 or k==X.shape[2]-2)) or ((j==0 or j==X.shape[1]-2 or i==0 or i==X.shape[0]-2) and (k==0 or k==X.shape[2]-2)):
                         temp_shape = createColorCubeBorde(i,j,k, X,Y, Z,0.1)
                         merge(destinationShape=isosurfaceBorde, strideSize=6, sourceShape=temp_shape)
 
-                    elif abs(load_voxels[i,j,k]-t_a) <=2:
+                # Espacio offset de "Paredes"
+                elif k==X.shape[2]-2 or j==X.shape[1]-2 or i==X.shape[0]-2 or k==0 or j==0 or i==0:
+                    pass
+                
+                # Hay peces, almacenar info
+                elif load_voxels[i-1,j-1,k-1]:                    
+                    if abs(load_voxels[i-1,j-1,k-1]-t_a) <=2:
                         temp_shape = createColorCube(i,j,k, X,Y, Z,1)
                         merge(destinationShape=isosurfaceA, strideSize=6, sourceShape=temp_shape)
                         coordenadas_t_a.append([i,j,k])
 
-                    elif abs(load_voxels[i,j,k]-t_b) <=2:
+                    if abs(load_voxels[i-1,j-1,k-1]-t_b) <=2:
                         temp_shape = createColorCube(i,j,k, X,Y, Z,0.6)
                         merge(destinationShape=isosurfaceB, strideSize=6, sourceShape=temp_shape)
                         coordenadas_t_b.append([i,j,k])
 
-                    elif abs(load_voxels[i,j,k]-t_c) <=2:
+                    if abs(load_voxels[i-1,j-1,k-1]-t_c) <=2:
                         temp_shape = createColorCube(i,j,k, X,Y, Z,0.3)
                         merge(destinationShape=isosurfaceC, strideSize=6, sourceShape=temp_shape)
                         coordenadas_t_c.append([i,j,k])
                     
                     
-    print(len(coordenadas_t_a),'T,a')
-    print(len(coordenadas_t_b),'T,b')
-    print(len(coordenadas_t_c),'T,c')
 
+    # Se guardan peces y su ubicación
     shapePezA = createPez(coordenadas_t_a, X, Y, Z,1,n_a)
     shapePezB = createPez(coordenadas_t_b, X, Y, Z,0.6,n_b)
     shapePezC = createPez(coordenadas_t_c, X, Y, Z,0.3,n_c)
 
+    # Voxeles espacios habitables para los peces
     gpu_surfaceA = es.toGPUShape(isosurfaceA)
     gpu_surfaceB = es.toGPUShape(isosurfaceB)
     gpu_surfaceC = es.toGPUShape(isosurfaceC)
 
+    # Borde del acuario
     gpu_surfaceBorde = es.toGPUShape(isosurfaceBorde)
 
     t0 = glfw.get_time()
     camera_theta = np.pi/4
     camera_theta2 = -1
 
+    # Movimiento distinto aletas
     angulo_aleta = -0.8
     angulo_aleta1 = -0.4
     angulo_aleta2 = 0.4
@@ -670,6 +666,8 @@ if __name__ == "__main__":
     ang_der1 = True
     ang_der2 = True
     ang_der3 = True
+
+    # Radio inicial de camara
     radio = 10
 
 
