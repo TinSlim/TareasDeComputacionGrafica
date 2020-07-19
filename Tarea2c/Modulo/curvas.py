@@ -97,6 +97,14 @@ def curvas_pajaros(lista):
     n=0
     while n<len(lista)-3:
         G = Catmull( np.array([[ lista[n][0],lista[n][1],lista[n][2]]]).T,np.array([[lista[n+1][0],lista[n+1][1],lista[n+1][2]]]).T,np.array([[lista[n+2][0],lista[n+2][1],lista[n+2][2]]]).T,np.array([[lista[n+3][0],lista[n+3][1],lista[n+3][2]]]).T)
-        curvas_puntos.append(evalCurve(G,500))####10 implica velocidad
+        
+        # Se agrega distancia, que corresponde a la distancia entre ambos puntos, delante y atrás
+        distancia =( ((lista[n+2][0]-lista[n+1][0])**2)+( (lista[n+2][1]-lista[n+1][1])**2)+ ((lista[n+2][2]-lista[n+1][2])**2)  ) **(1/2)
+        
+        # Discretizacion crece si hay más distancia y es menor si hay menos, de modo que si ambos puntos son más distantes se tendrán más
+        # puntos entremedio, manteniendo una velocidad sin importar la distancia entre los puntos
+        discretizacion = int(distancia*150)
+        
+        curvas_puntos.append(evalCurve(G,discretizacion))####10 implica velocidad
         n+=1
     return curvas_puntos
