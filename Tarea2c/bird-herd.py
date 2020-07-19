@@ -58,6 +58,17 @@ class controller():
     angulo=-0.1
     rotation_y=0.1
 
+    angulo1=0.4
+    rotation_y1=-1.0
+
+    angulo2=1.2
+    rotation_y2=-2.6
+
+    angulo3=0.5
+    rotation_y3=-1.1
+    
+    angulo4=0.9
+    rotation_y4=-1.9
 
     rotacion_alas=0
     rotation_x=-1.6#0
@@ -65,6 +76,15 @@ class controller():
 
     alas_subiendo = True
     alas_bajando = False
+    alas_subiendo1 = True
+    alas_bajando1 = False
+    alas_subiendo2 = True
+    alas_bajando2 = False
+    alas_subiendo3 = True
+    alas_bajando3 = False
+    alas_subiendo4 = True
+    alas_bajando4 = False
+
 
     angulo_pajaro=0
 
@@ -497,6 +517,66 @@ if __name__ == "__main__":
                 control.angulo-=0.02
                 control.rotation_y+=0.04
 
+        if control.alas_subiendo1:
+            if control.angulo1>1.2 or control.rotation_y1<-2.6:
+                control.alas_subiendo1 = not control.alas_subiendo1
+                control.alas_bajando1 = not control.alas_bajando1
+            else:
+                control.angulo1+=0.02
+                control.rotation_y1-=0.04
+        elif control.alas_bajando1:
+            if control.angulo1<-0.1 or control.rotation_y1>0.1:
+                control.alas_subiendo1 = not control.alas_subiendo1
+                control.alas_bajando1 = not control.alas_bajando1
+            else:
+                control.angulo1-=0.02
+                control.rotation_y1+=0.04
+
+        if control.alas_subiendo2:
+            if control.angulo2>1.2 or control.rotation_y2<-2.6:
+                control.alas_subiendo2 = not control.alas_subiendo2
+                control.alas_bajando2 = not control.alas_bajando2
+            else:
+                control.angulo2+=0.02
+                control.rotation_y2-=0.04
+        elif control.alas_bajando2:
+            if control.angulo2<-0.1 or control.rotation_y2>0.1:
+                control.alas_subiendo2 = not control.alas_subiendo2
+                control.alas_bajando2 = not control.alas_bajando2
+            else:
+                control.angulo2-=0.02
+                control.rotation_y2+=0.04
+
+        if control.alas_subiendo3:
+            if control.angulo3>1.2 or control.rotation_y3<-2.6:
+                control.alas_subiendo3 = not control.alas_subiendo3
+                control.alas_bajando3 = not control.alas_bajando3
+            else:
+                control.angulo3+=0.02
+                control.rotation_y3-=0.04
+        elif control.alas_bajando3:
+            if control.angulo3<-0.1 or control.rotation_y3>0.1:
+                control.alas_subiendo3 = not control.alas_subiendo3
+                control.alas_bajando3 = not control.alas_bajando3
+            else:
+                control.angulo3-=0.02
+                control.rotation_y3+=0.04
+
+        if control.alas_subiendo4:
+            if control.angulo4>1.2 or control.rotation_y4<-2.6:
+                control.alas_subiendo4 = not control.alas_subiendo4
+                control.alas_bajando4 = not control.alas_bajando4
+            else:
+                control.angulo4+=0.02
+                control.rotation_y4-=0.04
+        elif control.alas_bajando4:
+            if control.angulo4<-0.1 or control.rotation_y4>0.1:
+                control.alas_subiendo4 = not control.alas_subiendo4
+                control.alas_bajando4 = not control.alas_bajando4
+            else:
+                control.angulo4-=0.02
+                control.rotation_y4+=0.04
+        
         ##############################
         ##Actualización Alas para cada pajaro##
         ##############################
@@ -506,29 +586,29 @@ if __name__ == "__main__":
         Ala_Derecha.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
         Ala_Izquierda.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
         ###############
-        Ala_Inf_Izquierda2.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
-        Ala_Inf_Derecha2.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
+        Ala_Inf_Izquierda2.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo1)),tr.translate(-1.5,2,2)])
+        Ala_Inf_Derecha2.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo1),tr.translate(1.5,2,2)])
 
-        Ala_Derecha2.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
-        Ala_Izquierda2.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
+        Ala_Derecha2.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y1),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
+        Ala_Izquierda2.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y1)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
         ###############
-        Ala_Inf_Izquierda3.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
-        Ala_Inf_Derecha3.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
+        Ala_Inf_Izquierda3.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo2)),tr.translate(-1.5,2,2)])
+        Ala_Inf_Derecha3.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo2),tr.translate(1.5,2,2)])
 
-        Ala_Derecha3.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
-        Ala_Izquierda3.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
+        Ala_Derecha3.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y2),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
+        Ala_Izquierda3.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y2)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
         ###############
-        Ala_Inf_Izquierda4.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
-        Ala_Inf_Derecha4.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
+        Ala_Inf_Izquierda4.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo3)),tr.translate(-1.5,2,2)])
+        Ala_Inf_Derecha4.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo3),tr.translate(1.5,2,2)])
 
-        Ala_Derecha4.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
-        Ala_Izquierda4.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
+        Ala_Derecha4.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y3),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
+        Ala_Izquierda4.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y3)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
         ################
-        Ala_Inf_Izquierda5.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo)),tr.translate(-1.5,2,2)])
-        Ala_Inf_Derecha5.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo),tr.translate(1.5,2,2)])
+        Ala_Inf_Izquierda5.transform = tr.matmul([tr.translate(1.5,-2,-2),tr.rotationY(-(control.angulo4)),tr.translate(-1.5,2,2)])
+        Ala_Inf_Derecha5.transform = tr.matmul([tr.translate(-1.5,-2,-2),tr.rotationY(control.angulo4),tr.translate(1.5,2,2)])
 
-        Ala_Derecha5.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
-        Ala_Izquierda5.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
+        Ala_Derecha5.transform = tr.matmul([tr.translate(-1,-2.5,0),tr.rotationZ(control.rotation_y4),tr.rotationX(control.rotation_x),tr.translate(1,2.5,0)])###
+        Ala_Izquierda5.transform = tr.matmul([tr.translate(1,-2.5,0),tr.rotationZ(-1*(control.rotation_y4)),tr.rotationX(control.rotation_x),tr.translate(-1,2.5,0)])
    
 
         ##Posición de los pájaros (x,y,z) según coordenadas de la curva del inicio
