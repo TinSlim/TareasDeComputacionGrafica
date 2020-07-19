@@ -71,7 +71,7 @@ class controller():
     rotation_y4=-1.9
 
     rotacion_alas=0
-    rotation_x=-1.6#0
+    rotation_x=-1.6
     derivada=0
 
     alas_subiendo = True
