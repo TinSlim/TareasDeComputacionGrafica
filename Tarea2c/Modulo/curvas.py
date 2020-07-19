@@ -103,8 +103,8 @@ def curvas_pajaros(lista):
         
         # Discretizacion crece si hay más distancia y es menor si hay menos, de modo que si ambos puntos son más distantes se tendrán más
         # puntos entremedio, manteniendo una velocidad sin importar la distancia entre los puntos
-        discretizacion = int(distancia*150)
-        
+        discretizacion = int(distancia*150)+1
+
         curvas_puntos.append(evalCurve(G,discretizacion))####10 implica velocidad
         n+=1
     return curvas_puntos
